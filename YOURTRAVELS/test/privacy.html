@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>プライバシーポリシー｜YOUR TRAVELS</title>
+<meta name="description" content="YOUR TRAVELS が取り扱う情報の種類、保存場所、利用目的について説明しています。">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* 本文はすべて同じ書体。アプリ名のロゴだけ別（欧文のため） */
+    --font: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP',
+            'Yu Gothic', 'Meiryo', system-ui, sans-serif;
+    --font-logo: 'Futura', 'Futura PT', 'Jost', 'Century Gothic', sans-serif;
+    --bg: #FBF6F0; --text: #4C3C30; --text-sub: #6E5A49; --text-muted: #9C8878;
+    --border: rgba(90, 71, 56, 0.12); --border-strong: rgba(90, 71, 56, 0.22);
+    --v3: #C5919D; --v4: #915666;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: var(--font); color: var(--text); background: var(--bg);
+    font-size: 15px; line-height: 1.95; padding: 44px 22px 72px;
+    text-align: left; -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 600px; margin: 0 auto; }
+
+  /* 表紙 */
+  /* 文章の中のアプリ名。ロゴのように字間は広げない */
+  .nm { font-family: var(--font-logo); letter-spacing: 0.06em; font-weight: 500; }
+  .logo { font-family: var(--font-logo); font-size: 15px; letter-spacing: 6px;
+          color: var(--text-muted); font-weight: 400; }
+  .logo em { font-style: normal; color: var(--v3); font-weight: 500; }
+  h1 { font-size: 23px; font-weight: 600; letter-spacing: 0.02em; line-height: 1.5;
+       margin: 10px 0 18px; }
+  .lead { font-size: 14.5px; color: var(--text-sub); }
+
+  /* 見出し。番号つきで、どこを読んでいるか分かるように */
+  h2 { font-size: 17px; font-weight: 600; letter-spacing: 0.02em; line-height: 1.6;
+       margin: 38px 0 12px; padding-top: 26px; border-top: 0.5px solid var(--border);
+       display: flex; align-items: baseline; gap: 10px; }
+  h2::before { content: ''; flex: none; width: 7px; height: 7px; border-radius: 50%;
+               background: var(--v3); transform: translateY(-2px); }
+
+  p { margin-bottom: 14px; }
+  p:last-child { margin-bottom: 0; }
+  b { font-weight: 600; }
+
+  ul { list-style: none; margin: 12px 0 16px; }
+  li { padding-left: 1.1em; position: relative; margin-bottom: 10px; }
+  li::before { content: '・'; position: absolute; left: 0; color: var(--text-muted); }
+  li:last-child { margin-bottom: 0; }
+
+  /* 項目を書き出すところ。見出しと中身を縦に並べる */
+  .item { margin: 16px 0; padding-left: 14px; border-left: 2px solid var(--border); }
+  .item + .item { margin-top: 20px; }
+  .item h3 { font-size: 15px; font-weight: 600; line-height: 1.6; margin-bottom: 6px; }
+  .item dl { margin: 0; }
+  .item dt { font-size: 12.5px; color: var(--text-muted); margin-top: 8px; line-height: 1.7; }
+  .item dt:first-child { margin-top: 0; }
+  .item dd { margin: 0; font-size: 14.5px; color: var(--text-sub); }
+
+  a { color: var(--v4); text-underline-offset: 3px; }
+  .btn { display: inline-block; margin-top: 6px; font-size: 14.5px; padding: 11px 22px;
+         border: 0.5px solid var(--border-strong); border-radius: 100px;
+         text-decoration: none; background: #fff; }
+
+  footer { margin-top: 48px; padding-top: 24px; border-top: 0.5px solid var(--border-strong);
+           font-size: 13px; color: var(--text-muted); }
+  footer .f-copy { color: var(--text-sub); }
+  footer p { margin-bottom: 6px; }
+
+  @media (max-width: 400px) {
+    body { font-size: 14.5px; padding: 36px 18px 60px; }
+    h1 { font-size: 21px; }
+    h2 { font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="logo">YOUR <em>TRAVELS</em></div>
+  <h1>プライバシーポリシー</h1>
+  <p class="lead"><span class="nm">YOUR TRAVELS</span>（以下「本アプリ」）では、お使いになる方の情報を大切に取り扱います。
+    このページでは、本アプリがどんな情報を扱い、どこに保存し、何に使っているかをご説明します。</p>
+
+  <h2>基本方針</h2>
+  <p><b>旅の記録が、運営者に送られることはありません。</b>
+    本アプリには、記録を集めるサーバーがありません。
+    入力された内容は<b>お使いの端末の中</b>か、Google アカウントでログインした場合は
+    <b>ご自身の Google ドライブ</b>に保存されます。
+    運営者がその中身を見ることはできません。</p>
+
+  <h2>情報の保存場所</h2>
+  <p>本アプリが情報を保存する場所は、次の2つです。</p>
+
+  <div class="item">
+    <h3>お使いの端末（ブラウザの中）</h3>
+    <dl>
+      <dt>保存内容</dt>
+      <dd>行った国・都市・都道府県・市区町村・駅・空港、日付、訪問の種類、メモ、写真、行きたい場所、持ち物リスト、言語や表示の設定</dd>
+      <dt>削除方法</dt>
+      <dd>設定の「すべて削除」から消せます。ブラウザのデータを消した場合も、あわせて消えます</dd>
+    </dl>
+  </div>
+
+  <div class="item">
+    <h3>ご自身の Google ドライブ（ログインした場合）</h3>
+    <dl>
+      <dt>保存内容</dt>
+      <dd>上と同じ内容の控え</dd>
+      <dt>削除方法</dt>
+      <dd>ログアウトするときに、預けた内容ごと消せます</dd>
+    </dl>
+  </div>
+
+  <p>Google ドライブに預けるときは、<b>本アプリ専用の、表には出ない場所</b>を使います。
+    お使いの写真や書類など、ほかのファイルに触れることはありません。
+    この場所は、ほかのアプリからも見えません。</p>
+
+  <h2>Google アカウントでのログインについて</h2>
+  <ul>
+    <li>Google から受け取るのは<b>メールアドレスだけ</b>です。どのアカウントの記録かを見分けるために使います</li>
+    <li>お名前・プロフィール画像・連絡先・カレンダー・ほかのファイルは受け取りません</li>
+    <li>受け取ったメールアドレスは<b>お使いの端末の中だけ</b>に保存し、外に送ることはありません</li>
+    <li>本アプリが Google にお願いしている許可は、<b>本アプリが作ったデータの保存と読み出し</b>、
+      <b>ログインしている方の確認</b>、<b>メールアドレスの受け取り</b>の3つです。
+      Google ドライブにあるほかのファイルを読み書きする許可は、お願いしていません</li>
+    <li>いつでもおやめいただけます。本アプリでログアウトするか、
+      <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">Google アカウントの「アプリとサービス」</a>から許可を取り消せます</li>
+  </ul>
+
+  <h2>外部サービスの利用</h2>
+  <p>天気と為替レートを調べるときだけ、外部のサービスを使います。
+    どちらの場合も、<b>どなたが使っているかが分かる情報は送っていません。</b></p>
+
+  <div class="item">
+    <h3>Open-Meteo（天気）</h3>
+    <dl>
+      <dt>送るもの</dt><dd>行き先の場所と日付だけ</dd>
+      <dt>使いみち</dt><dd>旅行中の天気をお見せするため</dd>
+    </dl>
+  </div>
+  <div class="item">
+    <h3>Exchange Rate API（為替レート）</h3>
+    <dl>
+      <dt>送るもの</dt><dd>ありません（円を基準としたレートを受け取るだけです）</dd>
+      <dt>使いみち</dt><dd>現地のお金の目安をお見せするため</dd>
+    </dl>
+  </div>
+  <div class="item">
+    <h3>Google Fonts（書体）</h3>
+    <dl>
+      <dt>送るもの</dt><dd>ありません（画面に使う書体を受け取るだけです）</dd>
+      <dt>使いみち</dt><dd>文字をきれいにお見せするため</dd>
+    </dl>
+  </div>
+
+  <p>記録の中身、メモ、写真、メールアドレスは、これらのどこにも送っていません。</p>
+
+  <h2>取得・提供していない情報</h2>
+  <ul>
+    <li>アクセス解析は入れていません。どのページをご覧になったかを集めることはありません</li>
+    <li>広告は表示していません。広告のために行動を追うこともありません</li>
+    <li>お預かりした情報を、第三者にお渡ししたり、売ったりすることはありません</li>
+    <li>Cookie は使っていません（設定は端末の中に保存しています）</li>
+  </ul>
+
+  <h2>写真の取り扱い</h2>
+  <p>記録につけた写真は<b>お使いの端末の中</b>に保存され、外に送られることはありません。
+    Google アカウントでログインした場合も、写真は端末の中に置かれたままです。</p>
+
+  <h2>共有画像の取り扱い</h2>
+  <p>共有用の画像は<b>お使いの端末の中だけで作られ</b>、外に送られることはありません。
+    画像に入るのは件数・国旗・バッジで、くわしい地名やメモ、写真、細かい日付は入りません。</p>
+
+  <h2>未成年の利用について</h2>
+  <p>年齢による制限は設けていませんが、本アプリは、お名前や連絡先をお聞きする作りにはなっていません。</p>
+
+  <h2>本ポリシーの変更</h2>
+  <p>この内容を変えるときは、このページを書きかえ、下の最終更新日を新しくします。
+    大きな変更があるときは、本アプリの中でもお知らせします。</p>
+
+  <h2>お問い合わせ</h2>
+  <p>機能追加のご要望は、LINE から承っています。
+    アップデートや新しい機能のお知らせも、LINE からお届けしています。</p>
+  <p><a class="btn" href="https://lin.ee/Qs4sZBub" target="_blank" rel="noopener">LINE でお問い合わせ</a></p>
+
+  <footer>
+    <p>最終更新：2026年10月3日</p>
+    <p class="f-copy"><span class="nm">YOUR TRAVELS</span> &copy; 2026 n-webtools</p>
+    <p><a href="./">← アプリにもどる</a></p>
+  </footer>
+
+</div>
+</body>
+</html>
