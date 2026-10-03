@@ -3905,7 +3905,9 @@
   .intro-six b { font-family: var(--font-jp); font-weight: 500; font-size: 12.5px;
     color: var(--text); display: block; margin-top: 3px; }
   .intro-six span { font-size: 10.5px; line-height: 1.5; color: var(--text-muted);
-    display: block; margin-top: 2px; text-wrap: pretty; }
+    display: block; margin-top: 2px;
+    /* 改行の位置は言葉のほうで決める（\n で折る）。自然な切れ目にするため */
+    white-space: pre-line; }
   /* できることの説明と、押すところを分ける区切り線 */
   .intro-rule { width: 100%; border-top: 0.5px solid var(--border-strong);
     margin-top: 26px; padding-top: 24px; }
@@ -3921,14 +3923,16 @@
   .intro-chip { display: inline-block; font-size: 11px; letter-spacing: 1.5px; color: var(--v4);
     background: rgba(197, 145, 157, 0.14); border-radius: 999px; padding: 5px 14px; margin-top: 24px; }
   @media (max-height: 700px) {
-    .intro { padding: 44px 20px 18px; }
-    .intro .brand { margin-bottom: 8px; }
+    /* 上は JP/EN の下にゆとりを残す（つまって見えないように） */
+    .intro { padding: 58px 20px 18px; }
+    .intro .brand { margin-bottom: 12px; }
     .intro-chip { margin-top: 18px; }
     .intro-six { gap: 9px 8px; margin-top: 16px; }
     .intro-six .em { font-size: 23px; }
     .intro-rule { margin-top: 16px; padding-top: 16px; }
     .intro-why { margin-top: 5px; }
-    .intro-or { margin: 11px 0 10px; }
+    /* 左右は auto のまま（中央ぞろえを消さない） */
+    .intro-or { margin: 11px auto 10px; }
     .intro-more .intro-why { margin-bottom: 10px; }
   }
   /* さらに狭い端末では、字も少し小さく */
@@ -5649,12 +5653,12 @@ window.dataUpdatedText = function (en) {
       introGoogleWhy: 'Your records stay, even if you switch devices or clear your data.',
       introOr: 'or',
       introNoDownload: 'No app to install — it just works here',
-      canWorld: 'World',    canWorldSub: 'Colour in the countries you visit',
-      canJapan: 'Japan',    canJapanSub: 'Prefectures, cities, stations, airports',
-      canPack: 'Packing',   canPackSub: 'A list for where you are going',
-      canWish: 'Wishlist',  canWishSub: 'Places you want to go next',
-      canPhoto: 'Photos',   canPhotoSub: 'Add photos and a few words',
-      canBadge: 'Badges',   canBadgeSub: 'Collect them as you travel',
+      canWorld: 'World',    canWorldSub: 'Colour in the countries\nyou have visited',
+      canJapan: 'Japan',    canJapanSub: 'Prefectures, cities,\nstations and airports',
+      canPack: 'Packing',   canPackSub: 'A packing list for\nwhere you are going',
+      canWish: 'Wishlist',  canWishSub: 'Places you want\nto go next',
+      canPhoto: 'Photos',   canPhotoSub: 'Add photos and\na few words',
+      canBadge: 'Badges',   canBadgeSub: 'Collect them\nas you travel',
       introDemoWhy: 'Try it with records already in. Nothing is saved.',
       googleSoon: 'Google sign-in is not ready yet. For now, your records are kept on this device.',
       setGoogleSub: 'Your records stay, even if you switch devices or clear your data.',
@@ -5893,12 +5897,12 @@ window.dataUpdatedText = function (en) {
       introGoogleWhy: '端末を変えても、データを消しても記録は残ります。',
       introOr: 'または',
       introNoDownload: 'アプリを入れずに、このまま使えます',
-      canWorld: '世界',       canWorldSub: '行った国と都市を地図に塗る',
-      canJapan: '日本',       canJapanSub: '都道府県・市区町村・駅・空港まで',
-      canPack: '持ち物',      canPackSub: '行き先に合わせたリスト',
-      canWish: '行きたい',    canWishSub: '次に行く場所を残しておく',
-      canPhoto: '写真とメモ', canPhotoSub: '記録に写真とひとことを',
-      canBadge: 'バッジ',     canBadgeSub: '集めて旅をふりかえる',
+      canWorld: '世界',       canWorldSub: '行った国と都市を\n地図に塗る',
+      canJapan: '日本',       canJapanSub: '都道府県・市区町村\n駅・空港まで',
+      canPack: '持ち物',      canPackSub: '行き先に合わせた\n持ち物リスト',
+      canWish: '行きたい',    canWishSub: '次に行く場所を\n残しておく',
+      canPhoto: '写真とメモ', canPhotoSub: '記録に写真と\nひとことを',
+      canBadge: 'バッジ',     canBadgeSub: '集めて\n旅をふりかえる',
       introDemoWhy: '記録が入った状態でさわれます。何も保存されません。',
       googleSoon: 'Google ログインは準備中です。いまは、この端末に記録を保存して使えます。',
       setGoogleSub: '端末を変えても、データを消しても記録は残ります。',
