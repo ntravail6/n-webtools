@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Your Travels — every place, remembered</title>
+<title>YOUR TRAVELS — every place, remembered</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=Shippori+Mincho:wght@400;500;600&family=Kosugi+Maru&display=swap" rel="stylesheet">
@@ -151,7 +151,8 @@
       radial-gradient(ellipse 700px 400px at 90% 20%, rgba(217, 165, 82, 0.07) 0%, transparent 60%);
     overflow-y: auto;
     display: flex;
-    padding: 40px 20px;
+    /* 上は JP/EN の居場所ぶん空ける（中身が入りきらないとき、下に潜らないように） */
+    padding: 46px 20px 40px;
   }
 
   .intro[hidden] { display: none; }
@@ -3825,12 +3826,14 @@
   .head-gear:hover { color: var(--v4); }
   header { position: relative; }
   /* 最初の画面：言語の切り替えは右上（ほかの画面と同じ位置） */
-  .intro-lang { position: absolute; top: 16px; right: 20px; margin: 0; }
+  .intro-lang { position: absolute; top: 13px; right: 20px; margin: 0; }
   .intro { position: fixed; }
   /* 「テスト版」の丸は、ロゴの真上に */
   .intro .intro-badge { margin: 0 0 18px; }
   /* 下の著作権表示（押すと「このアプリについて」） */
   .foot-copy-btn { background: none; border: none; font-family: var(--font); cursor: pointer; }
+  /* アプリ名を少しだけ目立たせる */
+  .foot-app { color: var(--text-sub); letter-spacing: 1.5px; }
   /* カードの上の「みじかく・くわしく」 */
   .card-mode { justify-content: flex-end; padding: 12px 20px 0; margin: 0; }
   /* 色の説明（いつも出しておく） */
@@ -3901,7 +3904,7 @@
     margin-top: 26px; padding-top: 24px; }
   /* 背の低い端末では、すき間をつめて「はじめる」を画面の中に収める */
   @media (max-height: 700px) {
-    .intro { padding: 24px 20px; }
+    .intro { padding: 44px 20px 18px; }
     .intro .brand { margin-bottom: 8px; }
     .intro-six { gap: 9px 8px; margin-top: 16px; }
     .intro-six .em { font-size: 23px; }
@@ -3926,6 +3929,11 @@
   /* 題字の下の帯（入れなくていいことを伝える） */
   .intro-chip { display: inline-block; font-size: 11px; letter-spacing: 1.5px; color: var(--v4);
     background: rgba(197, 145, 157, 0.14); border-radius: 999px; padding: 5px 14px; margin-top: 12px; }
+  /* いちばん下に、プライバシーポリシーへの案内 */
+  .intro-privacy { display: inline-block; margin-top: 22px; font-size: 11px;
+    color: var(--text-muted); letter-spacing: 0.06em; text-decoration: underline;
+    text-underline-offset: 3px; text-decoration-color: rgba(156, 136, 120, 0.35); }
+  .intro-privacy:hover { color: var(--text-sub); }
   /* 記録が消えるおそれの注意（赤くして見落としを防ぐ） */
   .intro-warn { color: #B4453F; margin-top: 4px; }
   .intro-warn[hidden] { display: none; }
@@ -4121,7 +4129,7 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Your Travels">
+  <meta name="apple-mobile-web-app-title" content="YOUR TRAVELS">
   <meta name="theme-color" content="#FBF6F0">
 </head>
 <body>
@@ -4690,7 +4698,7 @@ window.dataUpdatedText = function (en) {
       <button type="button" class="foot-link" id="reset" hidden></button>
     </div>
     <input type="file" id="import-file" accept=".json,application/json" hidden>
-    <button type="button" class="foot-copy foot-copy-btn" id="about-open" aria-label="About" data-i18n-label="lblAbout">© 2026<span class="test-only"> · <span data-i18n="footTest">Test version</span></span></button>
+    <button type="button" class="foot-copy foot-copy-btn" id="about-open" aria-label="About" data-i18n-label="lblAbout"><span class="foot-app">YOUR TRAVELS</span> © 2026 n-webtools<span class="test-only"> · <span data-i18n="footTest">Test version</span></span></button>
   </footer>
 </div>
 
@@ -4782,6 +4790,7 @@ window.dataUpdatedText = function (en) {
       <button type="button" class="intro-demo" id="intro-demo" data-i18n="introDemo">Take a look inside</button>
       <p class="intro-why" id="intro-demo-why" data-i18n="introDemoWhy">Try it with records already in. Nothing is saved.</p>
     </div>
+    <a class="intro-privacy" href="privacy.html" target="_blank" rel="noopener" data-i18n="setPrivacy">Privacy policy</a>
   </div>
 </div>
 
@@ -5434,7 +5443,7 @@ window.dataUpdatedText = function (en) {
   // Translations
   const translations = {
     en: {
-      title: 'Your Travels — every place, remembered',
+      title: 'YOUR TRAVELS — every place, remembered',
       tagline: 'Every place, remembered',
       countries: 'Countries',
       ofWorld: 'of the world',
@@ -5655,7 +5664,7 @@ window.dataUpdatedText = function (en) {
       noTrips: 'No trips recorded yet',
       confirmImport: 'Replace all current data with the imported file? Your current data will be lost.',
       confirmReset: 'Delete everything — your trips, your wishlist and your packing list? You can undo it right afterwards.',
-      importError: 'Couldn’t import this file. Please make sure it’s a file exported from Your Travels.',
+      importError: 'Couldn’t import this file. Please make sure it’s a file exported from YOUR TRAVELS.',
       footBackup: 'Save a backup',
       footLoad: 'Load a backup',
       footDelete: 'Delete everything',
@@ -5678,7 +5687,7 @@ window.dataUpdatedText = function (en) {
       searchResultWish: 'Want to go',
     },
     ja: {
-      title: 'Your Travels — 旅した場所を、記憶に',
+      title: 'YOUR TRAVELS — 旅した場所を、記憶に',
       tagline: '旅した場所を、記憶に',
       countries: '国',
       ofWorld: '国と地域',

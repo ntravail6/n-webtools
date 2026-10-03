@@ -1,6 +1,6 @@
 {
-  "name": "Your Travels",
-  "short_name": "Your Travels",
+  "name": "YOUR TRAVELS",
+  "short_name": "YOUR TRAVELS",
   "description": "旅した場所を、記憶に。世界と日本の地図に記録して、持ち物リストも作れます。",
   "lang": "ja",
   "start_url": "./index.html",
