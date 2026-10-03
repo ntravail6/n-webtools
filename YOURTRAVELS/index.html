@@ -156,7 +156,13 @@
   }
 
   .intro[hidden] { display: none; }
-  .intro-in { max-width: 420px; margin: auto; text-align: center; animation: popIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+  /* 題字から「端末を変えても〜」までを画面の真ん中に、
+     「中をのぞいてみる」から下はいちばん下に置く */
+  .intro-in { width: 100%; max-width: 420px; margin: 0 auto; text-align: center;
+    display: flex; flex-direction: column;
+    animation: popIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+  .intro-main { margin: auto 0; width: 100%; }
+  .intro-tail { margin-top: 30px; width: 100%; }
 
   /* レベルの帯の右の「画像を作る」。帯ぜんたいが押せるので、重ならないように上に出す */
   /* 1行に入らず折り返したときも、右端にそろえる（margin-left:auto） */
@@ -3882,8 +3888,9 @@
   .intro-why + .intro-choice, .intro-why + .intro-more { margin-top: 18px; }
   /* 「はじめる」の下だけは、消えるおそれの注意なので少し読ませる */
   .intro-why-care { max-width: 320px; margin-left: auto; margin-right: auto; }
-  .intro-more .intro-why { margin-bottom: 16px; }
-  .intro-more .intro-why:last-child { margin-bottom: 0; }
+  .intro-more .intro-why { margin-bottom: 0; }
+  /* 「中をのぞいてみる」と、その説明は近づける */
+  .intro-tail .intro-why { margin-top: 3px; }
 
   .intro-demo { background: none; border: none; font-family: var(--font); font-size: 12.5px;
     color: var(--text-muted); letter-spacing: 0.06em; cursor: pointer; padding: 6px 10px;
@@ -3903,9 +3910,20 @@
   .intro-rule { width: 100%; border-top: 0.5px solid var(--border-strong);
     margin-top: 26px; padding-top: 24px; }
   /* 背の低い端末では、すき間をつめて「はじめる」を画面の中に収める */
+  /* 「はじめる」と「Googleでログイン」は、同じことの別のやり方 */
+  /* 「または」。左右の線は、上の区切り線より短くする */
+  .intro-or { width: 100%; max-width: 230px; margin: 16px auto 14px;
+    font-size: 10.5px; color: var(--text-muted); letter-spacing: 3px;
+    display: flex; align-items: center; gap: 10px; }
+  .intro-or::before, .intro-or::after { content: ''; flex: 1; height: 0.5px; background: var(--border-strong); }
+  .intro-or[hidden] { display: none; }
+  /* 題字の下の帯（入れなくていいことを伝える） */
+  .intro-chip { display: inline-block; font-size: 11px; letter-spacing: 1.5px; color: var(--v4);
+    background: rgba(197, 145, 157, 0.14); border-radius: 999px; padding: 5px 14px; margin-top: 24px; }
   @media (max-height: 700px) {
     .intro { padding: 44px 20px 18px; }
     .intro .brand { margin-bottom: 8px; }
+    .intro-chip { margin-top: 18px; }
     .intro-six { gap: 9px 8px; margin-top: 16px; }
     .intro-six .em { font-size: 23px; }
     .intro-rule { margin-top: 16px; padding-top: 16px; }
@@ -3919,16 +3937,6 @@
     .intro-six b { font-size: 11.5px; }
     .intro-six span { font-size: 10px; }
   }
-  /* 「はじめる」と「Googleでログイン」は、同じことの別のやり方 */
-  /* 「または」。左右の線は、上の区切り線より短くする */
-  .intro-or { width: 100%; max-width: 230px; margin: 16px auto 14px;
-    font-size: 10.5px; color: var(--text-muted); letter-spacing: 3px;
-    display: flex; align-items: center; gap: 10px; }
-  .intro-or::before, .intro-or::after { content: ''; flex: 1; height: 0.5px; background: var(--border-strong); }
-  .intro-or[hidden] { display: none; }
-  /* 題字の下の帯（入れなくていいことを伝える） */
-  .intro-chip { display: inline-block; font-size: 11px; letter-spacing: 1.5px; color: var(--v4);
-    background: rgba(197, 145, 157, 0.14); border-radius: 999px; padding: 5px 14px; margin-top: 12px; }
   /* いちばん下に、プライバシーポリシーへの案内 */
   .intro-privacy { display: inline-block; margin-top: 22px; font-size: 11px;
     color: var(--text-muted); letter-spacing: 0.06em; text-decoration: underline;
@@ -4761,6 +4769,7 @@ window.dataUpdatedText = function (en) {
     <button class="lang-btn" data-lang="en">EN</button>
   </div>
   <div class="intro-in">
+    <div class="intro-main">
     <div class="intro-badge test-only" data-i18n="introBadge">Test version</div>
     <h1 class="brand">YOUR <em>TRAVELS</em></h1>
     <p class="tagline" data-i18n="tagline">Every place, remembered</p>
@@ -4787,10 +4796,14 @@ window.dataUpdatedText = function (en) {
         <span data-i18n="introGoogle">Sign in with Google</span>
       </button>
       <p class="intro-why" id="intro-google-why" data-i18n="introGoogleWhy">Your records stay, even if you switch devices or clear your data.</p>
+    </div>
+    </div>
+
+    <div class="intro-tail">
       <button type="button" class="intro-demo" id="intro-demo" data-i18n="introDemo">Take a look inside</button>
       <p class="intro-why" id="intro-demo-why" data-i18n="introDemoWhy">Try it with records already in. Nothing is saved.</p>
+      <a class="intro-privacy" href="privacy.html" target="_blank" rel="noopener" data-i18n="setPrivacy">Privacy policy</a>
     </div>
-    <a class="intro-privacy" href="privacy.html" target="_blank" rel="noopener" data-i18n="setPrivacy">Privacy policy</a>
   </div>
 </div>
 
@@ -5795,7 +5808,7 @@ window.dataUpdatedText = function (en) {
       jpDrill: '→ 市区町村を選ぶ',
       jpNoTrips: 'まだ記録がありません',
       jpTimes: '回',
-      jpPlacesCount: '箇所',
+      jpPlacesCount: 'か所',
       settingsEyebrow: 'アプリ',
       footSettings: '設定',
       settingsTitle: '設定',
@@ -5875,7 +5888,7 @@ window.dataUpdatedText = function (en) {
       introGo: 'はじめる',
       introSample: 'サンプル入りで始める',
       introBlank: 'まっさらから始める',
-      introGoogle: 'Googleでログイン',
+      introGoogle: 'Google でログイン',
       introDemo: '中をのぞいてみる',
       introGoWhy: 'ログインせずに、この端末だけで使います。',
       introGoWarn: '※ ブラウザのデータを消すと、記録も消えます',
@@ -5889,7 +5902,7 @@ window.dataUpdatedText = function (en) {
       canPhoto: '写真とメモ', canPhotoSub: '記録に写真とひとことを',
       canBadge: 'バッジ',     canBadgeSub: '集めて旅をふりかえる',
       introDemoWhy: '記録が入った状態でさわれます。何も保存されません。',
-      googleSoon: 'Googleログインは準備中です。いまは、この端末に記録を保存して使えます。',
+      googleSoon: 'Google ログインは準備中です。いまは、この端末に記録を保存して使えます。',
       setGoogleSub: '端末を変えても、データを消しても記録は残ります。',
       setPrivacy: 'プライバシーポリシー',
       setPrivacySub: '何を・どこに置き・何に使うか',
@@ -8444,7 +8457,7 @@ window.dataUpdatedText = function (en) {
       if (v.date) {
         const d = new Date(v.date + 'T00:00:00');
         day = d.getDate();
-        sub = W ? `${d.getMonth() + 1}月(${W[d.getDay()]})`
+        sub = W ? `${d.getMonth() + 1}月（${W[d.getDay()]}）`
                 : d.toLocaleDateString('en-US', { month: 'short' }) + ' · ' + d.toLocaleDateString('en-US', { weekday: 'short' });
       }
       const flag = flagFor(v.countryId);
@@ -10161,7 +10174,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     const areaTxt = areas.length > 1 ? '国内＋海外' : (areas[0] === 'domestic' ? '国内' : '海外');
     const head = names.length === 1
       ? `<span>${esc(names[0])}</span>`
-      : `<span>${esc(names[0])}</span> <span>ほか</span>${names.length - 1}<span>箇所</span>`;
+      : `<span>${esc(names[0])}</span> <span>ほか</span>${names.length - 1}<span>か所</span>`;
     $('pk-dest-btn').innerHTML = `<span>${head}<small>${esc(areaTxt)}</small></span>`;
   }
 
@@ -12267,7 +12280,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         day = d.getDate();
         sub = currentLangIsEnSafe()
           ? d.toLocaleDateString('en-US', { month: 'short' }) + ' · ' + d.toLocaleDateString('en-US', { weekday: 'short' })
-          : `${d.getMonth() + 1}月(${W[d.getDay()]})`;
+          : `${d.getMonth() + 1}月（${W[d.getDay()]}）`;
       }
       const [label, pref] = placeOf(v);
       return `<div class="tl-item">
@@ -12290,7 +12303,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       <div class="yr yr-all">
         <div class="yr-year">${currentLangIsEnSafe() ? 'All' : 'これまで'}</div>
         <div class="yr-flags">${allPrefs.map(c => `<span title="${escapeHtml(prefName(c))}">${prefEmoji(c) || '•'}</span>`).join('')}</div>
-        <div class="yr-count">${allPrefs.length}${currentLangIsEnSafe() ? (allPrefs.length === 1 ? ' prefecture' : ' prefectures') : '箇所'}</div>
+        <div class="yr-count">${allPrefs.length}${currentLangIsEnSafe() ? (allPrefs.length === 1 ? ' prefecture' : ' prefectures') : 'か所'}</div>
       </div>`;
 
     list.innerHTML = head + years.map(y => `
