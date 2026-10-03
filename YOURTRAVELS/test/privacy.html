@@ -8,13 +8,13 @@
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Kosugi+Maru&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* 本文はすべて同じ書体。アプリ名のロゴだけ別（欧文のため） */
-    --font: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP',
-            'Yu Gothic', 'Meiryo', system-ui, sans-serif;
-    --font-logo: 'Futura', 'Futura PT', 'Jost', 'Century Gothic', sans-serif;
+    /* アプリの「世界」の画面と同じ書体にそろえる */
+    --font: 'Futura', 'Futura PT', 'Futura Std', 'Jost', 'Kosugi Maru',
+            'Century Gothic', 'Trebuchet MS', sans-serif;
+    --font-logo: var(--font);
     --bg: #FBF6F0; --text: #4C3C30; --text-sub: #6E5A49; --text-muted: #9C8878;
     --border: rgba(90, 71, 56, 0.12); --border-strong: rgba(90, 71, 56, 0.22);
     --v3: #C5919D; --v4: #915666;
@@ -22,8 +22,8 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: var(--font); color: var(--text); background: var(--bg);
-    font-size: 15px; line-height: 1.95; padding: 44px 22px 72px;
-    text-align: left; -webkit-font-smoothing: antialiased;
+    font-size: 14.5px; line-height: 2.05; letter-spacing: 0.01em;
+    padding: 44px 22px 72px; text-align: left; -webkit-font-smoothing: antialiased;
   }
   .page { max-width: 600px; margin: 0 auto; }
 
@@ -148,7 +148,7 @@
     <h3>Exchange Rate API（為替レート）</h3>
     <dl>
       <dt>送るもの</dt><dd>ありません（円を基準としたレートを受け取るだけです）</dd>
-      <dt>使いみち</dt><dd>現地のお金の目安をお見せするため</dd>
+      <dt>使いみち</dt><dd>現地のお金のめやすをお見せするため</dd>
     </dl>
   </div>
   <div class="item">
