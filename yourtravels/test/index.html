@@ -202,21 +202,6 @@
   .card-foot { text-align: center; margin-top: 12px; }
   .card-foot[hidden] { display: none; }
 
-  /* ── 最初の画面：水に浮いているように、傾けると動く ──────────────
-     奥のもの（うすい光・ロゴ）はゆっくり小さく、手前のもの（ボタン）は大きく動かすと
-     重なって浮いているように見える。動かす量は JavaScript が --fx / --fy に入れる。
-     指で動かすこともできる。動きを控える設定の人には出さない。 */
-  .intro-float { will-change: transform;
-    transform: translate3d(var(--fx, 0px), var(--fy, 0px), 0) rotate(var(--fr, 0deg)); }
-  .intro-glow { position: absolute; inset: -14%; pointer-events: none; z-index: -1;
-    background-image:
-      radial-gradient(ellipse 900px 500px at 50% 12%, rgba(197, 145, 157, 0.13) 0%, transparent 60%),
-      radial-gradient(ellipse 700px 400px at 86% 30%, rgba(217, 165, 82, 0.09) 0%, transparent 60%); }
-  /* 光の板を別に出すので、画面そのものの背景の絵は消す */
-  .intro.has-float { background-image: none; }
-  @media (prefers-reduced-motion: reduce) {
-    .intro-float { transform: none !important; }
-  }
 
   .intro-badge {
     display: inline-block;
@@ -7904,10 +7889,21 @@ window.dataUpdatedText = function (en) {
     const db = document.getElementById('intro-demo');
     if (!db) return;
     if (window.__DEMO__) { db.hidden = true; return; }
+    // 「中をのぞいてみる」を押したとき
+    //   同じ場所の test/ にお試し版を置いてあれば、そちらを開く。
+    //   （URL を直接書かないのは、知人用・公開用など置き場所が増えても同じ作りで動くようにするため）
+    //   置いていない場合は、いままでどおり同じページをお試しの形で開く。
     db.addEventListener('click', () => {
-      const u = location.origin === 'null' ? location.href.split('?')[0] : location.origin + location.pathname;
-      // サンプルが入った状態で、そのまま開く（途中でもう一度えらばせない）
-      location.href = u + '?demo&sample';
+      const here = location.origin === 'null' ? location.href.split('?')[0] : location.origin + location.pathname;
+      const dir = here.replace(/[^/]*$/, '');          // いまのページがあるフォルダ
+      const fallback = () => { location.href = here + '?demo&sample'; };
+      if (location.protocol !== 'http:' && location.protocol !== 'https:') return fallback();
+      let done = false;
+      const go = ok => { if (done) return; done = true; ok ? (location.href = dir + 'test/?sample') : fallback(); };
+      setTimeout(() => go(false), 2500);               // 返事が無いときは待たせない
+      fetch(dir + 'test/', { method: 'HEAD' })
+        .then(r => go(r.ok))
+        .catch(() => go(false));
     });
   })();
 
@@ -12343,125 +12339,6 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     if (saved === 'japan') setMap('japan', false);
   })();
 </script>
-<script>
-// ── 最初の画面：水に浮いているように、傾けると動く ─────────────────
-//   ばねと水の抵抗で動かすので、傾けた向きへ少し遅れて流れ、少し行き過ぎてから戻る。
-//   傾けていなくても、ゆらゆら漂いつづける。
-//   数値は _check/floatsim.py で合わせた（0.5秒で半分ほど流れ、17%行き過ぎ、2.2秒でおちつく）。
-(function () {
-  var intro = document.getElementById('intro');
-  if (!intro) return;
-  // 動きを控える設定の人には出さない
-  try {
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  } catch (e) {}
-
-  var K = 0.0018, DAMP = 0.960;   // 水の中のように、ゆっくり
-
-  // 浮かせるもの：奥のものほど depth を小さく（ゆっくり小さく動く）
-  var glow = document.createElement('div');
-  glow.className = 'intro-glow intro-float';
-  intro.insertBefore(glow, intro.firstChild);
-  intro.classList.add('has-float');
-
-  var picks = [
-    [glow, 0.30, 0.5],
-    ['.intro-badge', 0.55, 1.0],
-    ['.intro .brand', 0.70, 1.0],
-    ['.intro .tagline', 0.80, 1.1],
-    ['.intro-lead', 0.95, 1.1],
-    ['.intro-cards', 1.15, 1.2],
-    ['#intro-go', 1.45, 1.4],
-    ['#intro-choice', 1.45, 1.4],
-    ['.intro-more', 1.30, 1.3]
-  ];
-  var items = [];
-  picks.forEach(function (p, i) {
-    var el = typeof p[0] === 'string' ? intro.querySelector(p[0]) : p[0];
-    if (!el) return;
-    el.classList.add('intro-float');
-    items.push({
-      el: el, depth: p[1], rot: p[2],
-      x: 0, y: 0, vx: 0, vy: 0,
-      ph: i * 1.7, ph2: i * 2.3 + 0.8,
-      sp: 0.13 + (i % 4) * 0.038,     // ゆれの速さ（遅いほど水らしい）
-      // ゆれの大きさ。手前のものほど大きく揺らすと、奥行きが出て「動いている」と分かる
-      amp: (5 + (i % 3) * 3) * p[1]
-    });
-  });
-  if (!items.length) return;
-
-  var REACH = 30;                     // 傾けきったときに流れる距離（px・手前のもの）
-  var tx = 0, ty = 0, raf = 0, t0 = 0;
-  var clamp = function (v) { return v < -1 ? -1 : v > 1 ? 1 : v; };
-  function aim(x, y) { tx = clamp(x); ty = clamp(y); }
-
-  function frame(now) {
-    if (!t0) t0 = now;
-    var t = (now - t0) / 1000;
-    for (var i = 0; i < items.length; i++) {
-      var c = items[i];
-      var gx = tx * REACH * c.depth, gy = ty * REACH * c.depth;
-      c.vx = (c.vx + (gx - c.x) * K) * DAMP;
-      c.vy = (c.vy + (gy - c.y) * K) * DAMP;
-      c.x += c.vx; c.y += c.vy;
-      var bx = Math.sin(t * c.sp + c.ph) * c.amp * 0.6;
-      var by = Math.sin(t * c.sp * 0.78 + c.ph2) * c.amp;
-      var e = c.el.style;
-      e.setProperty('--fx', (c.x + bx).toFixed(2) + 'px');
-      e.setProperty('--fy', (c.y + by).toFixed(2) + 'px');
-      e.setProperty('--fr', (Math.sin(t * c.sp * 0.52 + c.ph) * 0.30 * c.rot + c.vx * 0.22 * c.rot).toFixed(3) + 'deg');
-    }
-    raf = requestAnimationFrame(frame);
-  }
-
-  function stop() {
-    if (raf) { cancelAnimationFrame(raf); raf = 0; }
-    items.forEach(function (c) {
-      c.el.style.removeProperty('--fx');
-      c.el.style.removeProperty('--fy');
-      c.el.style.removeProperty('--fr');
-    });
-  }
-  function start() { if (!raf) { t0 = 0; raf = requestAnimationFrame(frame); } }
-
-  // 最初の画面が出ているあいだだけ動かす（消えたら止める）
-  function sync() { if (intro.hidden) stop(); else start(); }
-  sync();
-  new MutationObserver(sync).observe(intro, { attributes: true, attributeFilter: ['hidden'] });
-  document.addEventListener('visibilitychange', function () { document.hidden ? stop() : sync(); });
-
-  // 指やマウスを動かしても動く（傾きが読めない端末のため）
-  intro.addEventListener('pointermove', function (e) {
-    aim(e.clientX / innerWidth * 2 - 1, e.clientY / innerHeight * 2 - 1);
-  }, { passive: true });
-  intro.addEventListener('pointerleave', function () { aim(0, 0); });
-
-  // 傾き（ジャイロ）で動かす
-  var listening = false;
-  function listen() {
-    if (listening) return;        // ゆるされたあとに2回つかないように
-    listening = true;
-    window.addEventListener('deviceorientation', function (e) {
-      if (e.gamma == null && e.beta == null) return;
-      aim((e.gamma || 0) / 26, ((e.beta || 0) - 40) / 26);
-    }, { passive: true });
-  }
-  // まず、そのまま読めるかためす（Android やパソコンはこれで動く）
-  listen();
-  // iPhone は一度ゆるしてもらう必要がある。最初の画面では聞かず、
-  // 「はじめる」などを押したときにだけ聞く（1回ゆるせば、次からは聞かれない）。
-  //   ※ Chrome も requestPermission を持っているので、有無では見分けられない。
-  //      どちらでも困らないように「先に聞く」ではなく「両方やる」形にしている。
-  // iPhone は「ゆるす」を押さないと傾きを読めない決まり（Appleが決めていて、省けない）。
-  // そこで、こちらからは何も聞かない。
-  //   ・傾きが読める端末（Android・パソコン）では、そのまま傾きで動く
-  //   ・読めない端末（iPhone）では、ひとりでに漂う動き＋指でなぞった動きだけになる
-  // どちらでも「止まって見える」ことはない。
-
-  window.introFloatStop = stop;   // 確認用
-})();
-</script>
 
 <script>
 // ── SNSに出す画像（ストーリー 1080×1920）───────────────────────────
@@ -12887,22 +12764,106 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       } },
 
     { no: '24', name: 'ステッカー貼り', nameEn: 'Stickers', side: 'both', ok: function (d) { return d.badges >= 3; },
+      anim: true,                       // 水の中でバッジが下に溜まる（動く）
       draw: function (g, d) {
-        fill(g, C.bg);
-        brand(g, 200, C.muted, 'center');
-        text(g, T(d, 'あつめたバッジ ', 'Badges ') + d.badges + ' / ' + d.badgeAll, W / 2, 260, { size: 30, color: C.sub, align: 'center', font: MIN, ls: 2 });
-        var POS = [[350, 120, -11], [390, 380, 7], [340, 690, -5], [560, 240, 9], [590, 530, -8], [540, 810, 13],
-                   [770, 130, 6], [800, 420, -13], [760, 730, 4], [990, 270, -6], [1020, 570, 11], [980, 830, -9],
-                   [1210, 150, 8], [1230, 450, -4], [1200, 760, 12]];
-        var n = Math.min(d.badgeGot.length, POS.length);
-        for (var i = 0; i < n; i++) {
-          g.save(); g.translate(POS[i][1], POS[i][0]); g.rotate(POS[i][2] * Math.PI / 180);
-          badge(g, 0, 0, 85, d.badgeGot[i], true); g.restore();
-        }
-        nums(g, [[d.n, '/' + d.of, d.nameN], [d.sub, '', d.nameSub], [d.gSeen, '/' + d.gAll, d.groupName]], H - 380, { pad: 80 });
-        text(g, 'Lv.' + d.lv + '　' + d.lvName, W / 2, H - 200, { size: 26, color: C.muted, align: 'center', ls: 3, font: SANS });
+        drawPoolBase(g, d);
+        var balls = makeBalls(d);
+        for (var k = 0; k < 420; k++) stepBalls(balls, 0, 1);   // 落ちつくまで先に進めておく
+        drawBalls(g, balls);
       } }
   ];
+
+  // ── ㉔ステッカー：水の中でバッジが下に溜まる ─────────────────
+  //   傾けた向き（または指の向き）を「下」にして、バッジが落ちて壁にたまり、
+  //   たがいにぶつかって積み重なる。丸どうしの当たり判定だけなので、外の道具は要らない。
+  //   数値は見本（_check/SNS画像案-ストーリー.html）で合わせたもの。
+  //   端から端まで沈むのに約2.9秒。水らしく、空気中よりずっとゆっくり。
+  var POOL = { x: 80, y: 330, w: 920, h: 1130, r: 85 };
+  var PG = 0.26, PDRAG = 0.962, PBOUNCE = 0.06, PFRIC = 0.975, PITER = 8, PSLEEP = 0.12;
+  var poolT = 0;
+
+  function drawPoolBase(g, d) {
+    fill(g, C.bg);
+    brand(g, 200, C.muted, 'center');
+    text(g, T(d, 'あつめたバッジ ', 'Badges ') + d.badges + ' / ' + d.badgeAll, W / 2, 260,
+      { size: 30, color: C.sub, align: 'center', font: MIN, ls: 2 });
+    g.fillStyle = 'rgba(197,145,157,0.07)';
+    rr(g, POOL.x, POOL.y, POOL.w, POOL.h, 26); g.fill();
+    g.strokeStyle = 'rgba(90,71,56,0.08)'; g.lineWidth = 2;
+    rr(g, POOL.x, POOL.y, POOL.w, POOL.h, 26); g.stroke();
+    nums(g, [[d.n, '/' + d.of, d.nameN], [d.sub, '', d.nameSub], [d.gSeen, '/' + d.gAll, d.groupName]], H - 300, { pad: 80 });
+    text(g, 'Lv.' + d.lv + '\u3000' + d.lvName, W / 2, H - 130,
+      { size: 26, color: C.muted, align: 'center', ls: 3, font: SANS });
+  }
+
+  function makeBalls(d) {
+    var n = Math.min(d.badgeGot.length, 18), out = [];
+    for (var i = 0; i < n; i++) {
+      out.push({
+        em: d.badgeGot[i],
+        x: POOL.r + 30 + (i % 5) * (POOL.w - 2 * POOL.r - 60) / 4,
+        y: POOL.r + 40 + Math.floor(i / 5) * 190,
+        vx: (Math.random() - 0.5) * 2, vy: 0, a: 0, va: 0, ph: i * 1.9
+      });
+    }
+    return out;
+  }
+
+  function stepBalls(b, gx, gy) {
+    var R = POOL.r, i, j;
+    poolT += 1 / 60;
+    for (i = 0; i < b.length; i++) {
+      var c = b[i];
+      var cur = Math.sin(poolT * 0.34 + c.ph) * 0.045;   // ゆるい水の流れ
+      c.vx = (c.vx + gx * PG - gy * cur) * PDRAG;
+      c.vy = (c.vy + gy * PG + gx * cur) * PDRAG;
+      c.x += c.vx; c.y += c.vy;
+    }
+    for (var k = 0; k < PITER; k++) {
+      for (i = 0; i < b.length; i++) {
+        for (j = i + 1; j < b.length; j++) {
+          var a = b[i], e = b[j];
+          var dx = e.x - a.x, dy = e.y - a.y, d2 = dx * dx + dy * dy;
+          if (d2 === 0) { e.x += 0.5; continue; }
+          var dist = Math.sqrt(d2), ov = 2 * R - dist;
+          if (ov <= 0) continue;
+          var nx = dx / dist, ny = dy / dist, push = ov / 2;
+          a.x -= nx * push; a.y -= ny * push; e.x += nx * push; e.y += ny * push;
+          var dvx = e.vx - a.vx, dvy = e.vy - a.vy, rv = dvx * nx + dvy * ny;
+          if (rv < 0) {
+            var imp = -(1 + PBOUNCE) * rv / 2;
+            a.vx -= imp * nx; a.vy -= imp * ny; e.vx += imp * nx; e.vy += imp * ny;
+            var tx = -ny, ty = nx, tv = (dvx * tx + dvy * ty) * (1 - PFRIC) / 2;
+            a.vx += tv * tx; a.vy += tv * ty; e.vx -= tv * tx; e.vy -= tv * ty;
+            a.va -= imp * 0.04; e.va += imp * 0.04;
+          }
+        }
+      }
+      for (i = 0; i < b.length; i++) {
+        var o = b[i];
+        if (o.x < R) { o.x = R; if (o.vx < 0) o.vx *= -PBOUNCE; o.vy *= PFRIC; }
+        if (o.x > POOL.w - R) { o.x = POOL.w - R; if (o.vx > 0) o.vx *= -PBOUNCE; o.vy *= PFRIC; }
+        if (o.y < R) { o.y = R; if (o.vy < 0) o.vy *= -PBOUNCE; o.vx *= PFRIC; }
+        if (o.y > POOL.h - R) { o.y = POOL.h - R; if (o.vy > 0) o.vy *= -PBOUNCE; o.vx *= PFRIC; }
+      }
+    }
+    for (i = 0; i < b.length; i++) {
+      var q = b[i];
+      if (Math.abs(q.vx) + Math.abs(q.vy) < PSLEEP) { q.vx *= 0.78; q.vy *= 0.78; }
+      q.va *= 0.955; q.a += q.va;
+    }
+  }
+
+  function drawBalls(g, b) {
+    for (var i = 0; i < b.length; i++) {
+      var c = b[i];
+      g.save();
+      g.translate(POOL.x + c.x, POOL.y + c.y);
+      g.rotate(c.a * Math.PI / 180);
+      badge(g, 0, 0, POOL.r, c.em, true);
+      g.restore();
+    }
+  }
 
   // ── 友達に教えるカード（い案：旅券の裏表紙ふう）──────────────
   function drawInvite(g, qrImg) {
@@ -12986,12 +12947,14 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   }
 
   function show() {
+    stopAnim();
     var wrap = el('card-stage');
     wrap.innerHTML = '';
     var c = invite ? (function () { var cc = makeCanvas(); drawInvite(cc.getContext('2d'), qrImg); return cc; })()
                    : render(list[at], data);
     c.className = 'card-canvas';
     wrap.appendChild(c);
+    if (!invite && list[at] && list[at].anim) startAnim(c, data);
     el('card-dots').innerHTML = invite ? '' : list.map(function (_, i) {
       return '<i class="' + (i === at ? 'on' : '') + '"></i>'; }).join('');
     el('card-now').textContent = invite ? (isEnLang() ? 'Card to share the app' : 'アプリを教えるカード')
@@ -12999,6 +12962,39 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     el('card-nav').hidden = invite || list.length < 2;
     drawButtons();
     if (!invite) savePick();
+  }
+
+  // ── 動くカード（いまは㉔ステッカーだけ）────────────────────
+  //   後ろの絵は1回だけ描いて取っておき、毎コマはバッジだけ描き直す（軽くするため）。
+  //   「写真に保存」を押すと、そのとき見えている形がそのまま画像になる。
+  var anim = { raf: 0, balls: null, bg: null, gx: 0, gy: 1 };
+  function stopAnim() {
+    if (anim.raf) cancelAnimationFrame(anim.raf);
+    anim.raf = 0; anim.balls = null; anim.bg = null; anim.gx = 0; anim.gy = 1;
+  }
+  function reduceMotion() {
+    try { return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+    catch (e) { return false; }
+  }
+  function startAnim(c, d) {
+    if (reduceMotion()) return;          // 動きを控える設定の人には動かさない
+    anim.bg = makeCanvas();
+    drawPoolBase(anim.bg.getContext('2d'), d);
+    anim.balls = makeBalls(d);
+    var g = c.getContext('2d');
+    var frame = function () {
+      stepBalls(anim.balls, anim.gx, anim.gy);
+      g.clearRect(0, 0, W, H);
+      g.drawImage(anim.bg, 0, 0);
+      drawBalls(g, anim.balls);
+      anim.raf = requestAnimationFrame(frame);
+    };
+    anim.raf = requestAnimationFrame(frame);
+  }
+  function aimPool(x, y) {
+    var L = Math.sqrt(x * x + y * y);
+    if (L < 0.08) return;                // ほぼ真ん中のときは向きを変えない
+    anim.gx = x / L; anim.gy = y / L;
   }
 
   function open(which) {
@@ -13021,7 +13017,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       });
   }
   function isEnLang() { try { return window.currentLangIsEn && window.currentLangIsEn(); } catch (e) { return false; } }
-  function close() { el('card-modal').classList.remove('show'); }
+  function close() { stopAnim(); el('card-modal').classList.remove('show'); }
 
   function currentCanvas() { return el('card-stage').querySelector('canvas'); }
   function fileName() {
@@ -13132,6 +13128,18 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     // 指で横にはらっても変わる
     var sx = null;
     var st = el('card-stage');
+    // 動くカードのとき、指やマウスのある向きが「下」になる
+    st.addEventListener('pointermove', function (e) {
+      if (!anim.raf) return;
+      var r = st.getBoundingClientRect();
+      aimPool((e.clientX - r.left) / r.width * 2 - 1, (e.clientY - r.top) / r.height * 2 - 1);
+    });
+    // 傾きが読める端末では、傾けた向きが「下」になる
+    window.addEventListener('deviceorientation', function (e) {
+      if (!anim.raf) return;
+      if (e.gamma == null && e.beta == null) return;
+      aimPool(Math.sin((e.gamma || 0) * Math.PI / 180), Math.sin((e.beta || 0) * Math.PI / 180));
+    }, { passive: true });
     st.addEventListener('pointerdown', function (e) { sx = e.clientX; });
     st.addEventListener('pointerup', function (e) {
       if (sx == null || invite || list.length < 2) return;
