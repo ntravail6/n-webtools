@@ -3875,7 +3875,9 @@
     border-radius: 12px; font-family: var(--font); font-size: 13px; color: #A84A4A; cursor: pointer;
     transition: background 0.2s; }
   .set-danger:hover { background: rgba(168, 74, 74, 0.07); }
-  .set-danger-note { font-size: 11px; color: var(--text-muted); line-height: 1.6; margin: 10px 0 0; }
+  /* 2つの文のあいだで必ず改行する（文が1行に混ざらないように） */
+  .set-danger-note { font-size: 11px; color: var(--text-muted); line-height: 1.6; margin: 10px 0 0;
+    white-space: pre-line; }
   /* ヘッダー右上の歯車 */
   .head-gear { position: absolute; top: -28px; right: -8px; width: 36px; height: 36px; display: flex;
     align-items: center; justify-content: center; background: none; border: none; cursor: pointer;
@@ -5554,7 +5556,7 @@ window.dataUpdatedText = function (en) {
       setGroupDisplay: 'Display',
       setGroupData: 'Your data',
       setGroupRecord: 'Records',
-      setDeleteNote: 'This clears every trip, wishlist item and packing list. You can undo it right afterwards.',
+      setDeleteNote: 'This clears every trip, wishlist item and packing list.\nYou can undo it right afterwards.',
       setKindsNote: 'Rename them or change the points. The strongest kind decides the map colour, and each record earns its points (they add up to your experience points).',
       setKindsReset: 'Reset to default',
       askDetailEyebrow: 'To start',
@@ -5815,7 +5817,7 @@ window.dataUpdatedText = function (en) {
       setGroupDisplay: '表示',
       setGroupData: 'データ',
       setGroupRecord: '記録のきまり',
-      setDeleteNote: '旅の記録・行きたい場所・持ち物リストがすべて消えます。すぐなら取り消せます。',
+      setDeleteNote: '旅の記録・行きたい場所・持ち物リストがすべて消えます。\nすぐなら取り消せます。',
       setKindsNote: '名前・説明・ポイントを変えられます。地図の色は、その場所でいちばん強い種類で決まります（通過と宿泊があれば宿泊の色）。ポイントは記録1件ごとにつき、合計が経験値になります。',
       setKindsReset: '最初の状態に戻す',
       askDetailEyebrow: 'はじめに',
@@ -8581,7 +8583,8 @@ window.dataUpdatedText = function (en) {
         openTagList(tag);
       });
     });
-    el.querySelectorAll('.search-result').forEach(row => {
+    // 国・都市の行だけ。タグの行（国を持たない）は上で別に受けている
+    el.querySelectorAll('.search-result[data-country-id]').forEach(row => {
       row.addEventListener('click', () => {
         const id = row.getAttribute('data-country-id');
         const name = row.getAttribute('data-country-name');
