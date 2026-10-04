@@ -4191,8 +4191,6 @@
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
   <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="YOUR TRAVELS">
@@ -4201,7 +4199,7 @@
 <body>
 <script>
 // 「テスト版」と出すかどうか（本番のアップロード用では false にする）
-window.__IS_TEST__ = false;
+window.__IS_TEST__ = true;
 // 収録している情報（国の情報・持ち物のめやすなど）を、最後に見直した日
 //   情報を入れ替えたら、ここの日付を書きかえてください
 window.DATA_UPDATED = '2026-09-29';
@@ -4217,7 +4215,7 @@ window.dataUpdatedText = function (en) {
 //   使い方1）URL のうしろに ?demo を付けて開く
 //   使い方2）このファイルを複製し、下の false を true にする（お試し版.html）
 (function () {
-  var forced = false;              // ← お試し版にするときは true
+  var forced = true;               // ← お試し版にするときは true
   var on = forced;
   var q = '';
   try { q = location.search + location.hash; } catch (e) {}
