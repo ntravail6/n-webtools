@@ -152,7 +152,7 @@
     overflow-y: auto;
     display: flex;
     /* 上は JP/EN の居場所ぶん空ける（中身が入りきらないとき、下に潜らないように） */
-    padding: 46px 20px 40px;
+    padding: 62px 20px 40px;
   }
 
   .intro[hidden] { display: none; }
@@ -1289,6 +1289,57 @@
   .add-form input:focus,
   .add-form textarea:focus { border-color: var(--v3); }
 
+  /* タグ。中身を作っている途中なので、できあがるまで出さない
+     （出すときは、この1行を消すだけ） */
+  /* タグ */
+  .tag-hint { font-size: 11px; line-height: 1.7; color: var(--text-muted); margin: 8px 0 0; }
+  .tag-picked { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+  .tag-picked:empty { display: none; }
+  .tag-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px;
+    background: rgba(197, 145, 157, 0.16); color: var(--v4); border: none;
+    border-radius: 100px; padding: 5px 11px; font-family: var(--font); cursor: pointer; }
+  .tag-chip .x { color: var(--text-muted); font-size: 13px; line-height: 1; }
+  .tag-suggest { margin-top: 8px; background: var(--surface);
+    border: 0.5px solid var(--border-strong); border-radius: 10px; overflow: hidden; }
+  .tag-suggest:empty { display: none; }
+  .tag-suggest button { display: flex; justify-content: space-between; align-items: center;
+    width: 100%; padding: 10px 14px; background: none; border: none; cursor: pointer;
+    font-family: var(--font); font-size: 13.5px; color: var(--v4); text-align: left; }
+  .tag-suggest button + button { border-top: 0.5px solid var(--border); }
+  /* 何も打っていないときの「よく使うタグ」 */
+  .tag-suggest.tag-often { background: none; border: none; border-radius: 0; margin-top: 12px; }
+  .tag-often-t { font-size: 10.5px; letter-spacing: 1.5px; color: var(--text-muted); margin: 0 0 7px; }
+  .tag-often-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag-often .tag-chip { width: auto; padding: 5px 11px; }
+  .tag-often .tag-chip .n { font-size: 10.5px; color: var(--text-muted); }
+  .tag-more { width: auto !important; padding: 7px 0 0 !important; background: none !important;
+    border: none !important; font-size: 11.5px !important; color: var(--text-muted) !important;
+    text-decoration: underline; text-underline-offset: 3px; }
+  .tag-suggest button:hover { background: var(--v0); }
+  .tag-suggest .n { font-size: 11px; color: var(--text-muted); }
+  /* 設定の「タグの整理」 */
+  /* 名前は1行目、件数は2行目、ボタンは右。名前が切れないように */
+  .tag-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px;
+    align-items: center; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+  .tag-row:last-child { border-bottom: none; }
+  .tag-row .nm { grid-column: 1; grid-row: 1; min-width: 0; font-size: 14px; color: var(--v4);
+    /* 長い名前は切らずに折り返す */
+    overflow-wrap: anywhere; line-height: 1.5; }
+  .tag-row .ct { grid-column: 1; grid-row: 2; font-size: 11px; color: var(--text-muted); }
+  .tag-row .btns { grid-column: 2; grid-row: 1 / span 2; display: flex; gap: 6px; }
+  .tag-row button { flex: none; background: none; border: 0.5px solid var(--border-strong);
+    border-radius: 100px; font-family: var(--font); font-size: 11.5px; color: var(--text-sub);
+    padding: 5px 11px; cursor: pointer; }
+  .tag-row button.del { color: #B4453F; border-color: rgba(180, 69, 63, .3); }
+  .tag-edit { display: flex; gap: 8px; align-items: center; width: 100%; }
+  .tag-edit input { flex: 1; min-width: 0; padding: 9px 11px; background: var(--surface);
+    border: 0.5px solid var(--border-strong); border-radius: 8px;
+    font-family: var(--font); font-size: 14px; color: var(--text); }
+  .tag-empty { font-size: 12.5px; color: var(--text-muted); padding: 10px 0; line-height: 1.8; }
+  /* 記録の一覧に出すタグ */
+  .visit-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+  .visit-tags span { font-size: 11.5px; background: rgba(197, 145, 157, 0.16);
+    color: var(--v4); border-radius: 100px; padding: 3px 9px; }
   .city-suggest {
     display: flex;
     flex-wrap: wrap;
@@ -3856,7 +3907,10 @@
     white-space: nowrap;
     font-weight: 500; letter-spacing: 0.05em; cursor: pointer; padding: 2px 6px; }
   .undo-btn:hover { color: #fff; }
-  .set-sub { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .set-sub { display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px;
+    /* 長いURLなど、切れ目のない字でも折り返す */
+    overflow-wrap: anywhere; word-break: break-word; }
+  .set-row .set-label { min-width: 0; }
   /* 設定の中の「Googleでログイン」 */
   #set-privacy { text-decoration: none; color: inherit; }
   .set-g { display: flex; align-items: center; gap: 8px; }
@@ -3899,7 +3953,7 @@
   .intro-demo[hidden], .intro-google[hidden], .intro-go[hidden] { display: none; }
   /* 上半分：できることを6つ並べる */
   .intro-six { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 10px;
-    width: 100%; margin-top: 24px; }
+    width: 100%; margin-top: 36px; }
   .intro-six > div { text-align: center; }
   .intro-six .em { font-size: 28px; line-height: 1.35; display: block; }
   .intro-six b { font-family: var(--font-jp); font-weight: 500; font-size: 12.5px;
@@ -3924,10 +3978,10 @@
     background: rgba(197, 145, 157, 0.14); border-radius: 999px; padding: 5px 14px; margin-top: 24px; }
   @media (max-height: 700px) {
     /* 上は JP/EN の下にゆとりを残す（つまって見えないように） */
-    .intro { padding: 58px 20px 18px; }
+    .intro { padding: 70px 20px 18px; }
     .intro .brand { margin-bottom: 12px; }
     .intro-chip { margin-top: 18px; }
-    .intro-six { gap: 9px 8px; margin-top: 16px; }
+    .intro-six { gap: 9px 8px; margin-top: 26px; }
     .intro-six .em { font-size: 23px; }
     .intro-rule { margin-top: 16px; padding-top: 16px; }
     .intro-why { margin-top: 5px; }
@@ -4212,40 +4266,40 @@ window.dataUpdatedText = function (en) {
     put('wanderlog-v3', JSON.stringify({
       version: 5,
       visits: [
-        { id: id(1), countryId: '392', countryName: 'Japan', city: '京都',
+        { id: id(1), tags: ['ひとりたび', 'さくら'], countryId: '392', countryName: 'Japan', city: '京都',
           cities: ['Kyoto', 'Osaka', 'Nara'], date: '2025-04-02', kind: 'live',
           note: '生まれ育った国。桜がちょうど満開でした',
           ig: 'https://www.instagram.com/p/sample/', photos: ['sample-a', 'sample-b'] },
-        { id: id(2), countryId: '276', countryName: 'Germany', city: 'ベルリン',
+        { id: id(2), tags: ['ママと'], countryId: '276', countryName: 'Germany', city: 'ベルリン',
           cities: ['Berlin', 'Munich'], date: '2022-08-11', kind: 'stay', note: 'ビール祭りの時期' },
-        { id: id(3), countryId: '410', countryName: 'South Korea', city: 'ソウル',
+        { id: id(3), tags: ['ひとりたび', 'たべあるき'], countryId: '410', countryName: 'South Korea', city: 'ソウル',
           cities: ['Seoul'], date: '2023-05-03', kind: 'stay', note: '屋台がおいしかった' },
-        { id: id(4), countryId: '158', countryName: 'Taiwan', city: '台北',
+        { id: id(4), tags: ['ともだちと', 'たべあるき'], countryId: '158', countryName: 'Taiwan', city: '台北',
           cities: ['Taipei'], date: '2023-09-18', kind: 'day', note: '日帰りで九份まで' },
-        { id: id(5), countryId: '764', countryName: 'Thailand', city: 'バンコク',
+        { id: id(5), tags: ['ひとりたび'], countryId: '764', countryName: 'Thailand', city: 'バンコク',
           cities: ['Bangkok'], date: '2024-01-07', kind: 'stay', note: '寺院めぐり' },
-        { id: id(6), countryId: '250', countryName: 'France', city: 'パリ',
+        { id: id(6), tags: ['卒業旅行', 'ともだちと'], countryId: '250', countryName: 'France', city: 'パリ',
           cities: ['Paris'], date: '2024-04-20', kind: 'stay', note: '1回目のパリ',
           ig: 'https://www.instagram.com/p/sample2/' },
-        { id: id(7), countryId: '250', countryName: 'France', city: 'リヨン',
+        { id: id(7), tags: ['卒業旅行'], countryId: '250', countryName: 'France', city: 'リヨン',
           cities: ['Lyon'], date: '2024-06-15', kind: 'stay', note: '2回目' },
-        { id: id(8), countryId: '250', countryName: 'France', city: 'ニース',
+        { id: id(8), tags: ['ひとりたび'], countryId: '250', countryName: 'France', city: 'ニース',
           cities: ['Nice'], date: '2024-09-02', kind: 'stay', note: '3回目' },
-        { id: id(9), countryId: '250', countryName: 'France', city: 'パリ',
+        { id: id(9), tags: ['ママと'], countryId: '250', countryName: 'France', city: 'パリ',
           cities: ['Paris'], date: '2025-03-10', kind: 'stay', note: '4回目' },
-        { id: id(10), countryId: '250', countryName: 'France', city: 'パリ',
+        { id: id(10), tags: ['ひとりたび', 'さくら'], countryId: '250', countryName: 'France', city: 'パリ',
           cities: ['Paris'], date: '', kind: 'day', note: '5回目。日付をおぼえていない記録' },
-        { id: id(11), countryId: '380', countryName: 'Italy', city: 'ローマ',
+        { id: id(11), tags: ['ともだちと'], countryId: '380', countryName: 'Italy', city: 'ローマ',
           cities: ['Rome', 'Florence'], date: '2024-07-14', kind: 'stay', note: 'ジェラートばかり食べていた' },
-        { id: id(12), countryId: '840', countryName: 'United States of America', city: 'ホノルル',
+        { id: id(12), tags: ['しごと'], countryId: '840', countryName: 'United States of America', city: 'ホノルル',
           cities: ['Honolulu'], date: '2024-11-23', kind: 'stay', note: '海がきれい' },
-        { id: id(13), countryId: '076', countryName: 'Brazil', city: 'リオデジャネイロ',
+        { id: id(13), tags: ['ひとりたび'], countryId: '076', countryName: 'Brazil', city: 'リオデジャネイロ',
           cities: ['Rio de Janeiro'], date: '2025-02-09', kind: 'stay', note: 'はじめての南半球' },
-        { id: id(14), countryId: '036', countryName: 'Australia', city: 'シドニー',
+        { id: id(14), tags: ['ともだちと'], countryId: '036', countryName: 'Australia', city: 'シドニー',
           cities: ['Sydney'], date: '2025-06-01', kind: 'stay', note: '季節が逆でおどろいた' },
-        { id: id(15), countryId: '818', countryName: 'Egypt', city: 'カイロ',
+        { id: id(15), tags: ['ママと'], countryId: '818', countryName: 'Egypt', city: 'カイロ',
           cities: ['Cairo'], date: '2025-09-12', kind: 'day', note: 'ピラミッドは本当に大きい' },
-        { id: id(16), countryId: '702', countryName: 'Singapore', city: '',
+        { id: id(16), tags: ['しごと'], countryId: '702', countryName: 'Singapore', city: '',
           cities: [], date: '2025-10-04', kind: 'transit', note: '空港で4時間の乗り継ぎ' }
       ],
       bucketList: [
@@ -4260,23 +4314,23 @@ window.dataUpdatedText = function (en) {
     //   11都道府県・四国4県制覇・同じ県に5回（常連）・市区町村・駅・空港・行きたい
     put('your-travels-japan-v1', JSON.stringify({
       visits: [
-        { id: 'js1', prefCode: '13', cityCodes: ['13101', '13113', '13103'],
+        { id: 'js1', tags: ['ママと'], prefCode: '13', cityCodes: ['13101', '13113', '13103'],
           date: '2022-05-15', kind: 'live', note: '東京に住んでいた頃', photos: ['sample-c'] },
-        { id: 'js2', prefCode: '13', cityCodes: ['13104'], date: '2023-07-01', kind: 'stay', note: '2回目' },
-        { id: 'js3', prefCode: '13', cityCodes: ['13110'], date: '2024-01-20', kind: 'stay', note: '3回目' },
-        { id: 'js4', prefCode: '13', cityCodes: [], date: '2024-11-03', kind: 'day', note: '4回目' },
-        { id: 'js5', prefCode: '13', cityCodes: [], date: '2025-05-05', kind: 'stay', note: '5回目。すっかり常連' },
-        { id: 'js6', prefCode: '26', cityCodes: ['26100'], date: '2025-04-01', kind: 'stay', note: '桜の季節' },
-        { id: 'js7', prefCode: '01', cityCodes: ['01100'], date: '2024-02-10', kind: 'stay', note: '雪まつり' },
-        { id: 'js8', prefCode: '47', cityCodes: ['47201'], date: '2023-08-20', kind: 'day', note: '海がきれい' },
-        { id: 'js9', prefCode: '36', cityCodes: ['36201'], date: '2025-08-13', kind: 'stay', note: '阿波おどり' },
-        { id: 'js10', prefCode: '37', cityCodes: ['37201'], date: '2025-08-15', kind: 'stay', note: 'うどん三昧' },
-        { id: 'js11', prefCode: '38', cityCodes: ['38201'], date: '2025-08-16', kind: 'stay', note: '道後温泉' },
-        { id: 'js12', prefCode: '39', cityCodes: ['39201'], date: '2025-08-18', kind: 'stay', note: '四国をひとまわり' },
-        { id: 'js13', prefCode: '14', cityCodes: ['14100'], date: '2024-06-09', kind: 'day', note: 'あじさいの鎌倉' },
-        { id: 'js14', prefCode: '23', cityCodes: ['23100'], date: '2023-03-21', kind: 'day', note: 'ひつまぶし' },
-        { id: 'js15', prefCode: '40', stationCode: '1190301', date: '2024-10-05', kind: 'transit', note: '博多駅で乗り継ぎ' },
-        { id: 'js16', prefCode: '01', airportCode: 'AP01', date: '2024-02-09', kind: 'day', note: '新千歳空港でスープカレー' }
+        { id: 'js2', tags: ['ひとりたび'], prefCode: '13', cityCodes: ['13104'], date: '2023-07-01', kind: 'stay', note: '2回目' },
+        { id: 'js3', tags: ['ともだちと'], prefCode: '13', cityCodes: ['13110'], date: '2024-01-20', kind: 'stay', note: '3回目' },
+        { id: 'js4', tags: ['しごと'], prefCode: '13', cityCodes: [], date: '2024-11-03', kind: 'day', note: '4回目' },
+        { id: 'js5', tags: ['たべあるき'], prefCode: '13', cityCodes: [], date: '2025-05-05', kind: 'stay', note: '5回目。すっかり常連' },
+        { id: 'js6', tags: ['ひとりたび', 'さくら'], prefCode: '26', cityCodes: ['26100'], date: '2025-04-01', kind: 'stay', note: '桜の季節' },
+        { id: 'js7', tags: ['ともだちと'], prefCode: '01', cityCodes: ['01100'], date: '2024-02-10', kind: 'stay', note: '雪まつり' },
+        { id: 'js8', tags: ['ママと'], prefCode: '47', cityCodes: ['47201'], date: '2023-08-20', kind: 'day', note: '海がきれい' },
+        { id: 'js9', tags: ['ひとりたび'], prefCode: '36', cityCodes: ['36201'], date: '2025-08-13', kind: 'stay', note: '阿波おどり' },
+        { id: 'js10', tags: ['たべあるき'], prefCode: '37', cityCodes: ['37201'], date: '2025-08-15', kind: 'stay', note: 'うどん三昧' },
+        { id: 'js11', tags: ['しごと'], prefCode: '38', cityCodes: ['38201'], date: '2025-08-16', kind: 'stay', note: '道後温泉' },
+        { id: 'js12', tags: ['ともだちと'], prefCode: '39', cityCodes: ['39201'], date: '2025-08-18', kind: 'stay', note: '四国をひとまわり' },
+        { id: 'js13', tags: ['ひとりたび'], prefCode: '14', cityCodes: ['14100'], date: '2024-06-09', kind: 'day', note: 'あじさいの鎌倉' },
+        { id: 'js14', tags: ['ママと'], prefCode: '23', cityCodes: ['23100'], date: '2023-03-21', kind: 'day', note: 'ひつまぶし' },
+        { id: 'js15', tags: ['さくら'], prefCode: '40', stationCode: '1190301', date: '2024-10-05', kind: 'transit', note: '博多駅で乗り継ぎ' },
+        { id: 'js16', tags: ['たべあるき'], prefCode: '01', airportCode: 'AP01', date: '2024-02-09', kind: 'day', note: '新千歳空港でスープカレー' }
       ],
       wishlist: [
         { prefCode: '17', note: '兼六園を見たい' },
@@ -4991,6 +5045,13 @@ window.dataUpdatedText = function (en) {
         <label class="field-label" for="visit-note" data-i18n="fieldMemory">Memory (optional)</label>
         <textarea id="visit-note" rows="3" placeholder="e.g. Cherry blossoms" maxlength="500"></textarea>
       </div>
+      <div class="tag-field">
+        <label class="field-label" for="visit-tags" data-i18n="fieldTags">Tags (optional)</label>
+        <input type="text" id="visit-tags" data-i18n-ph="phTags" placeholder="#solotrip  #mum  #graduation" maxlength="200" autocomplete="off">
+        <div class="tag-suggest" id="visit-tag-suggest"></div>
+        <div class="tag-picked" id="visit-tag-picked"></div>
+        <p class="tag-hint" data-i18n="tagsHint">Put # in front and separate with spaces.</p>
+      </div>
       <div>
         <label class="field-label" for="visit-ig" data-i18n="fieldIg">Instagram (optional)</label>
         <input type="url" id="visit-ig" placeholder="instagram.com/p/…" autocomplete="off" inputmode="url">
@@ -5318,6 +5379,16 @@ window.dataUpdatedText = function (en) {
           <button type="button" class="foot-link" id="howto-badges" data-i18n="howtoSeeBadges">See all badges</button>
         </div>
       </details>
+      <details class="set-fold" id="set-tags-fold">
+        <summary class="set-row set-go">
+          <span class="set-label"><span data-i18n="setTags">Tags</span><span class="set-sub" id="set-tags-sub"></span></span>
+          <span class="set-go-mark" aria-hidden="true">›</span>
+        </summary>
+        <div class="set-fold-body">
+          <p class="set-kinds-note" data-i18n="setTagsNote">Rename, merge or delete the tags you have used.</p>
+          <div id="tag-settings"></div>
+        </div>
+      </details>
       <details class="set-fold" id="set-kinds-fold">
         <summary class="set-row set-go">
           <span class="set-label" data-i18n="setKinds">Visit types</span>
@@ -5410,6 +5481,13 @@ window.dataUpdatedText = function (en) {
       <div>
         <label class="field-label" for="jp-form-note" data-i18n="fieldMemory">Memory (optional)</label>
         <textarea id="jp-form-note" rows="3" placeholder="e.g. Cherry blossoms" data-i18n-ph="phMemory" maxlength="500"></textarea>
+      </div>
+      <div class="tag-field">
+        <label class="field-label" for="jp-form-tags" data-i18n="fieldTags">Tags (optional)</label>
+        <input type="text" id="jp-form-tags" data-i18n-ph="phTags" placeholder="#solotrip  #mum  #graduation" maxlength="200" autocomplete="off">
+        <div class="tag-suggest" id="jp-tag-suggest"></div>
+        <div class="tag-picked" id="jp-tag-picked"></div>
+        <p class="tag-hint" data-i18n="tagsHint">Put # in front and separate with spaces.</p>
       </div>
       <div>
         <label class="field-label" for="jp-form-ig" data-i18n="fieldIg">Instagram (optional)</label>
@@ -5604,6 +5682,20 @@ window.dataUpdatedText = function (en) {
       fieldDate: 'Date (optional)',
       fieldCity: 'City (optional)',
       fieldMemory: 'Notes (optional)',
+      setTags: 'Tags',
+      setTagsNote: 'Rename, merge or delete the tags you have used. Renaming to an existing tag merges them.',
+      setTagsEmpty: 'No tags yet. Add one when you write a trip.',
+      setTagsCount: n => n + (n === 1 ? ' trip' : ' trips'),
+      setTagsRename: 'Rename',
+      setTagsSave: 'Save',
+      setTagsCancel: 'Cancel',
+      setTagsDelete: 'Delete',
+      setTagsDeleteAsk: n => 'Remove this tag from ' + n + (n === 1 ? ' trip' : ' trips') + '? The trips themselves stay.',
+      fieldTags: 'Tags (optional)',
+      phTags: '#solotrip #mum #graduation',
+      tagsHint: 'Put # in front and separate with spaces. Tap a tag to remove it.',
+      tagsOften: 'TAGS YOU USE',
+      tagsSeeAll: n => 'See all (' + n + ')',
       fieldIg: 'Instagram post (optional)',
       igOpen: 'Open in Instagram',
       fieldPhotos: 'Photos (optional)',
@@ -5616,7 +5708,10 @@ window.dataUpdatedText = function (en) {
       placeholderCity: 'e.g. Kyoto',
       placeholderCityFor: (c) => 'e.g. ' + c,
       placeholderMemory: 'e.g. Cherry blossoms in full bloom',
-      searchPlaceholder: 'Search countries or cities…',
+      searchPlaceholder: 'Country, city or #tag…',
+      searchTags: 'Tags',
+      searchResultTagged: n => n + (n === 1 ? ' trip' : ' trips'),
+      tagListEmpty: 'No trips with this tag.',
       searchCountries: 'Countries',
       searchCities: 'Cities',
       tabJournal: 'Journal',
@@ -5693,7 +5788,7 @@ window.dataUpdatedText = function (en) {
       undoCleared: 'Everything deleted',
       undoLoaded: 'Backup loaded',
       footTest: 'Trial version',
-      searchEmpty: 'No matches',
+      searchEmpty: 'No countries, cities or tags found',
       places: (n) => n + ' countr' + (n === 1 ? 'y' : 'ies'),
       cityCount: (n) => n + ' cit' + (n === 1 ? 'y' : 'ies'),
       wishCount: (n) => n + ' countr' + (n === 1 ? 'y' : 'ies'),
@@ -5848,6 +5943,20 @@ window.dataUpdatedText = function (en) {
       fieldDate: '日付（任意）',
       fieldCity: '都市（任意）',
       fieldMemory: 'メモ（任意）',
+      setTags: 'タグの整理',
+      setTagsNote: 'これまで使ったタグは、名前を変えたり、まとめたり、消したりできます。すでにあるタグと同じ名前にすると、ひとつにまとまります。',
+      setTagsEmpty: 'まだタグはありません。旅を書くときに付けられます。',
+      setTagsCount: n => n + '件の記録',
+      setTagsRename: '名前を変える',
+      setTagsSave: '決定',
+      setTagsCancel: 'やめる',
+      setTagsDelete: '消す',
+      setTagsDeleteAsk: n => 'このタグを' + n + '件の記録から外しますか？記録そのものは消えません。',
+      fieldTags: 'タグ（任意）',
+      phTags: '＃ひとりたび　＃ママと　＃卒業旅行',
+      tagsHint: '＃をつけて、スペースで区切ります。押すと消せます。',
+      tagsOften: 'よく使うタグ',
+      tagsSeeAll: n => 'すべて見る（' + n + 'こ）',
       fieldIg: 'Instagramの投稿URL（任意）',
       igOpen: 'Instagramで見る',
       fieldPhotos: '写真（任意・複数OK）',
@@ -5860,7 +5969,10 @@ window.dataUpdatedText = function (en) {
       placeholderCity: '例：京都',
       placeholderCityFor: (c) => '例：' + c,
       placeholderMemory: '例：桜が満開でした',
-      searchPlaceholder: '国名・都市名で検索',
+      searchPlaceholder: '国名・都市名・＃タグで検索',
+      searchTags: 'タグ',
+      searchResultTagged: n => n + '件の記録',
+      tagListEmpty: 'このタグのついた記録はありません。',
       searchCountries: '国',
       searchCities: '都市',
       tabJournal: '記録',
@@ -5937,7 +6049,7 @@ window.dataUpdatedText = function (en) {
       undoCleared: 'すべて削除しました',
       undoLoaded: 'バックアップを読み込みました',
       footTest: 'お試し版',
-      searchEmpty: '該当する国・都市がありません',
+      searchEmpty: '該当する国・都市・タグがありません',
       places: (n) => n + 'か国',
       cityCount: (n) => n + '都市',
       wishCount: (n) => n + 'か国',
@@ -6031,7 +6143,7 @@ window.dataUpdatedText = function (en) {
   //   版2：都市を複数持てる（cities）
   //   版3：日本の記録・持ち物・写真も一緒に保存
   //   版4：訪問の種類（kind）が付いた
-  const SCHEMA_VERSION = 5;
+  const SCHEMA_VERSION = 6;
   // 昔の種類は、いちばん近いものに置きかえる（立ち寄り＝外に出た → 日帰り／通過＝降りていない → 乗り継ぎ）
   const KIND_OLD = { stop: 'day', pass: 'transit' };
   function migrateData(raw) {
@@ -6074,10 +6186,273 @@ window.dataUpdatedText = function (en) {
       });
       v = 5; if (n) steps.push('「立ち寄り」「通過」を近い種類に置きかえた（' + n + '件）');
     }
+    if (v < 6) {
+      d.visits.forEach(x => { if (x && typeof x === 'object' && !Array.isArray(x.tags)) x.tags = []; });
+      v = 6; steps.push('タグの入れ物を足した');
+    }
     d.version = SCHEMA_VERSION;
     return { data: d, from, steps };
   }
   window.migrateDataShared = migrateData;
+
+  // ── タグ ────────────────────────────────────────────
+  //   メモとは別の欄に「＃ひとりたび ＃ママと」のように書く。
+  //   半角でも全角でも、「＃」でも「#」でも、スペースでも全角スペースでも同じに扱う。
+  (() => {
+    const MAX_LEN = 24;     // タグ1つの長さの上限
+    const MAX_NUM = 12;     // 1つの記録につけられる数の上限
+
+    // 書き方のゆれをそろえる（＃→なし、全角英数→半角、前後の空白を落とす）
+    function norm(one) {
+      if (!one) return '';
+      let t = String(one).normalize('NFKC');     // ＃→#、全角英数→半角
+      t = t.replace(/^[#＃\s]+/, '').replace(/[\s]+$/, '');
+      t = t.replace(/[\u3000\s]+/g, '');        // 中の空白は詰める
+      return t.slice(0, MAX_LEN);
+    }
+    // 入力欄の文字 → タグの配列
+    function parse(text) {
+      if (!text) return [];
+      const out = [];
+      String(text).split(/[\s\u3000,、]+/).forEach(p => {
+        const t = norm(p);
+        if (t && out.indexOf(t) < 0) out.push(t);
+      });
+      return out.slice(0, MAX_NUM);
+    }
+    // タグの配列 → 入力欄の文字
+    function format(tags) {
+      return (tags || []).map(t => '#' + t).join(' ');
+    }
+    // 画面に出す形
+    function label(t) { return '#' + t; }
+
+    // いま使われているタグを、多い順に数えて返す
+    function counts() {
+      const m = new Map();
+      const add = list => (list || []).forEach(v => {
+        (v && Array.isArray(v.tags) ? v.tags : []).forEach(t => m.set(t, (m.get(t) || 0) + 1));
+      });
+      try { add((JSON.parse(localStorage.getItem('wanderlog-v3') || '{}') || {}).visits); } catch (e) {}
+      try { add((JSON.parse(localStorage.getItem('your-travels-japan-v1') || '{}') || {}).visits); } catch (e) {}
+      return [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ja'))
+        .map(([tag, n]) => ({ tag, n }));
+    }
+    // 打ちかけの字に合う候補（多い順）
+    function suggest(typed, exclude) {
+      const q = norm(typed);
+      const ex = new Set(exclude || []);
+      return counts().filter(x => !ex.has(x.tag) && (!q || x.tag.indexOf(q) === 0)).slice(0, 6);
+    }
+    // ── 入力欄をタグとして動かす ──────────────────────
+    //   入力欄・候補・入れたタグの3つをつなぐ。世界と日本の両方で使う。
+    function wire(inputId, sugId, pickId) {
+      const inp = document.getElementById(inputId);
+      const sug = document.getElementById(sugId);
+      const pick = document.getElementById(pickId);
+      if (!inp || !sug || !pick) return null;
+      let tags = [];
+
+      function drawPicked() {
+        pick.innerHTML = '';
+        tags.forEach(t => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'tag-chip';
+          b.innerHTML = '<span></span><span class="x" aria-hidden="true">×</span>';
+          b.firstChild.textContent = label(t);
+          b.setAttribute('aria-label', label(t));
+          b.addEventListener('click', () => { tags = tags.filter(x => x !== t); drawPicked(); drawSug(); });
+          pick.appendChild(b);
+        });
+      }
+      let showAll = false;        // 「すべて見る」を押したか
+      const TOP = 4;              // 何も打っていないときに出す数
+      function drawSug() {
+        sug.innerHTML = '';
+        sug.className = 'tag-suggest';
+        if (tags.length >= MAX_NUM) return;
+        const typed = inp.value.trim();
+
+        // ── 何か打っているとき：合うものを一覧で出す ──
+        if (typed) {
+          suggest(typed, tags).forEach(({ tag, n }) => {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.innerHTML = '<span></span><span class="n"></span>';
+            b.firstChild.textContent = label(tag);
+            b.lastChild.textContent = n + (window.currentLangIsEnSafe && window.currentLangIsEnSafe() ? '' : '件');
+            b.addEventListener('click', () => { add(tag); inp.value = ''; });
+            sug.appendChild(b);
+          });
+          return;
+        }
+
+        // ── 何も打っていないとき：よく使うタグを粒で出す ──
+        const all = suggest('', tags);
+        if (!all.length) return;
+        sug.className = 'tag-suggest tag-often';
+        const ttl = document.createElement('p');
+        ttl.className = 'tag-often-t';
+        ttl.textContent = t('tagsOften');
+        sug.appendChild(ttl);
+        const row = document.createElement('div');
+        row.className = 'tag-often-row';
+        (showAll ? all : all.slice(0, TOP)).forEach(({ tag, n }) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'tag-chip out';
+          b.innerHTML = '<span></span><span class="n"></span>';
+          b.firstChild.textContent = label(tag);
+          b.lastChild.textContent = String(n);
+          b.addEventListener('click', () => add(tag));
+          row.appendChild(b);
+        });
+        sug.appendChild(row);
+        if (!showAll && all.length > TOP) {
+          const more = document.createElement('button');
+          more.type = 'button';
+          more.className = 'tag-more';
+          more.textContent = t('tagsSeeAll')(all.length);
+          more.addEventListener('click', () => { showAll = true; drawSug(); });
+          sug.appendChild(more);
+        }
+      }
+      function add(one) {
+        const t = norm(one);
+        if (!t || tags.indexOf(t) >= 0 || tags.length >= MAX_NUM) return;
+        tags.push(t); drawPicked(); drawSug();
+      }
+      // 区切りが打たれたら、そこまでをタグにする
+      inp.addEventListener('input', () => {
+        if (/[\s\u3000,、]/.test(inp.value)) {
+          parse(inp.value).forEach(add);
+          inp.value = '';
+        }
+        drawSug();
+      });
+      inp.addEventListener('keydown', e => {
+        if (e.isComposing) return;
+        if (e.key === 'Enter') { e.preventDefault(); parse(inp.value).forEach(add); inp.value = ''; drawSug(); }
+        if (e.key === 'Backspace' && !inp.value && tags.length) { tags.pop(); drawPicked(); drawSug(); }
+      });
+      inp.addEventListener('blur', () => { parse(inp.value).forEach(add); inp.value = ''; setTimeout(drawSug, 150); });
+
+      return {
+        get() { parse(inp.value).forEach(add); inp.value = ''; return tags.slice(); },
+        set(list) { tags = (list || []).map(norm).filter(Boolean); inp.value = ''; showAll = false; drawPicked(); drawSug(); },
+        clear() { tags = []; inp.value = ''; showAll = false; drawPicked(); drawSug(); }
+      };
+    }
+
+    // 記録の一覧に出す小さなタグ
+    function chips(v) {
+      const list = (v && Array.isArray(v.tags)) ? v.tags : [];
+      if (!list.length) return '';
+      return '<div class="visit-tags">' + list.map(t =>
+        '<span>' + String(label(t)).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+        + '</span>').join('') + '</div>';
+    }
+
+    // ── 名前を変える／まとめる／消す（世界と日本の両方を書きかえる）──
+    //   同じ名前にすると、ひとつにまとまる。
+    const STORES = ['wanderlog-v3', 'your-travels-japan-v1'];
+    function editAll(fn) {
+      let changed = 0;
+      STORES.forEach(key => {
+        let d;
+        try { d = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { return; }
+        if (!d || !Array.isArray(d.visits)) return;
+        let touched = false;
+        d.visits.forEach(v => {
+          if (!v || !Array.isArray(v.tags)) return;
+          const before = v.tags.join('\u0000');
+          const after = [];
+          fn(v.tags).forEach(t => { if (t && after.indexOf(t) < 0) after.push(t); });
+          if (after.join('\u0000') !== before) { v.tags = after; touched = true; changed++; }
+        });
+        if (touched) { try { localStorage.setItem(key, JSON.stringify(d)); } catch (e) {} }
+      });
+      return changed;
+    }
+    function rename(from, to) {
+      const a = norm(from), b = norm(to);
+      if (!a || !b || a === b) return 0;
+      return editAll(list => list.map(t => (t === a ? b : t)));
+    }
+    function remove(one) {
+      const a = norm(one);
+      if (!a) return 0;
+      return editAll(list => list.filter(t => t !== a));
+    }
+
+    // ── 設定の「タグの整理」を描く ──
+    function renderSettings() {
+      const box = document.getElementById('tag-settings');
+      const sub = document.getElementById('set-tags-sub');
+      if (!box) return;
+      const list = counts();
+      if (sub) sub.textContent = list.length ? String(list.length) : '';
+      box.innerHTML = '';
+      if (!list.length) {
+        const p = document.createElement('p');
+        p.className = 'tag-empty';
+        p.textContent = t('setTagsEmpty');
+        box.appendChild(p);
+        return;
+      }
+      list.forEach(({ tag, n }) => {
+        const row = document.createElement('div');
+        row.className = 'tag-row';
+        const nm = document.createElement('span');
+        nm.className = 'nm'; nm.textContent = label(tag);
+        const ct = document.createElement('span');
+        ct.className = 'ct'; ct.textContent = t('setTagsCount')(n);
+        const ren = document.createElement('button');
+        ren.type = 'button'; ren.textContent = t('setTagsRename');
+        const del = document.createElement('button');
+        del.type = 'button'; del.className = 'del'; del.textContent = t('setTagsDelete');
+        const btns = document.createElement('div');
+        btns.className = 'btns';
+        btns.append(ren, del);
+        row.append(nm, ct, btns);
+        box.appendChild(row);
+
+        ren.addEventListener('click', () => {
+          row.innerHTML = '';
+          row.style.gridTemplateColumns = '1fr';
+          const wrap = document.createElement('div');
+          wrap.className = 'tag-edit';
+          const inp = document.createElement('input');
+          inp.type = 'text'; inp.value = tag; inp.maxLength = MAX_LEN;
+          const ok = document.createElement('button');
+          ok.type = 'button'; ok.textContent = t('setTagsSave');
+          const no = document.createElement('button');
+          no.type = 'button'; no.textContent = t('setTagsCancel');
+          wrap.append(inp, ok, no);
+          row.appendChild(wrap);
+          inp.focus(); inp.select();
+          const done = () => { renderSettings(); if (window.refreshAfterTags) window.refreshAfterTags(); };
+          ok.addEventListener('click', () => { rename(tag, inp.value); done(); });
+          no.addEventListener('click', renderSettings);
+          inp.addEventListener('keydown', e => {
+            if (e.isComposing) return;
+            if (e.key === 'Enter') { e.preventDefault(); rename(tag, inp.value); done(); }
+            if (e.key === 'Escape') renderSettings();
+          });
+        });
+        del.addEventListener('click', () => {
+          if (!confirm(t('setTagsDeleteAsk')(n))) return;
+          remove(tag);
+          renderSettings();
+          if (window.refreshAfterTags) window.refreshAfterTags();
+        });
+      });
+    }
+
+    window.tagAPI = { norm, parse, format, label, counts, suggest, wire, chips,
+                      rename, remove, renderSettings, MAX_LEN, MAX_NUM };
+  })();
 
   const displayNamesCache = {};
   const jaExtra = {
@@ -6788,6 +7163,7 @@ window.dataUpdatedText = function (en) {
             ${visitCities(v).length ? `<div class="visit-city">${escapeHtml(cityText(v))}</div>` : ''}
             <div class="visit-date${v.date ? '' : ' no-date'}${visitCities(v).length ? '' : ' primary'}">${v.date ? formatDate(v.date) : escapeHtml(t('noDate'))}</div>
             ${v.note ? `<div class="visit-note">${escapeHtml(noteLabel(v.note))}</div>` : ''}
+            ${window.tagAPI ? window.tagAPI.chips(v) : ''}
             ${photosHtml(v)}
             ${igHtml(v.ig)}
           </div>
@@ -7181,12 +7557,12 @@ window.dataUpdatedText = function (en) {
       </div>`;
   }
 
-  function addVisit(date, cities, note, ig, photos, kind) {
+  function addVisit(date, cities, note, ig, photos, kind, tags) {
     if (!currentCountry) return;
     const { id, name } = currentCountry;
     const list = (cities || []).filter(Boolean);
     // city keeps the first one so older versions and backups still read the record
-    const visit = { id: gid(), countryId: id, countryName: name, city: list[0] || '', cities: list, date: date || '', note: note || '', kind: kind || KIND_DEFAULT };
+    const visit = { id: gid(), countryId: id, countryName: name, city: list[0] || '', cities: list, date: date || '', note: note || '', kind: kind || KIND_DEFAULT, tags: tags || [] };
     if (igInfo(ig)) visit.ig = ig.trim();
     if (photos && photos.length) visit.photos = photos;
     state.visits.push(visit);
@@ -7212,9 +7588,10 @@ window.dataUpdatedText = function (en) {
     removeVisit(id);
   });
 
-  function updateVisit(vid, date, cities, note, ig, photos, kind) {
+  function updateVisit(vid, date, cities, note, ig, photos, kind, tags) {
     const v = state.visits.find(x => x.id === vid);
     if (!v) return;
+    v.tags = tags || [];
     // Photos taken off the trip are deleted
     (v.photos || []).filter(id => !photos.includes(id)).forEach(id => photoDB.del(id).catch(() => {}));
     const list = (cities || []).filter(Boolean);
@@ -7246,6 +7623,7 @@ window.dataUpdatedText = function (en) {
 
   // Open the form to add a trip, or (with an id) to edit a saved one
   let editingId = null;
+  const wTags = window.tagAPI ? window.tagAPI.wire('visit-tags', 'visit-tag-suggest', 'visit-tag-picked') : null;
   function showAddForm(editId) {
     if (!currentCountry) return;
     const editing = typeof editId === 'string' ? state.visits.find(v => v.id === editId) : null;
@@ -7271,6 +7649,7 @@ window.dataUpdatedText = function (en) {
     // 一覧に出ているのと同じ文をそのまま出す（お試し記録のメモの言いかえに合わせる）
     document.getElementById('visit-note').value = editing ? noteLabel(editing.note || '') : '';
     document.getElementById('visit-ig').value = editing ? editing.ig || '' : '';
+    if (wTags) wTags.set(editing ? editing.tags : []);
     clearPendingPhotos();
     if (editing) loadExistingPhotos(editing.photos || []);
     updateCitySuggestions();
@@ -7437,9 +7816,20 @@ window.dataUpdatedText = function (en) {
   document.getElementById('settings-open').addEventListener('click', () => {
     renderSettings();
     renderKindSettings();
+    if (window.tagAPI) window.tagAPI.renderSettings();
     if (window.updateUndoRowShared) window.updateUndoRowShared();
     document.getElementById('settings-modal').classList.add('show');
   });
+  // タグの名前を変えたり消したりしたあと、画面の記録を出し直す
+  window.refreshAfterTags = function () {
+    try {
+      const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      if (raw && Array.isArray(raw.visits)) state.visits = raw.visits;
+      if (typeof renderAll === 'function') renderAll();
+      if (typeof renderSheetContent === 'function' && currentCountry) renderSheetContent();
+    } catch (e) {}
+    if (window.jpRefreshAfterTags) window.jpRefreshAfterTags();
+  };
   document.getElementById('settings-back').addEventListener('click', () =>
     document.getElementById('settings-modal').classList.remove('show'));
   document.querySelectorAll('.set-lang').forEach(b => b.addEventListener('click', () => {
@@ -8067,8 +8457,9 @@ window.dataUpdatedText = function (en) {
       try { await photoDB.put(id, p.blob); ids.push(id); } catch(e) {}
     }
     btn.disabled = false;
-    if (editingId) updateVisit(editingId, date, cities, note, ig, ids, pickedKind);
-    else addVisit(date, cities, note, ig, ids, pickedKind);
+    const tags = wTags ? wTags.get() : [];
+    if (editingId) updateVisit(editingId, date, cities, note, ig, ids, pickedKind, tags);
+    else addVisit(date, cities, note, ig, ids, pickedKind, tags);
     editingId = null;
     clearPendingPhotos();
     hideAddForm();
@@ -8140,8 +8531,9 @@ window.dataUpdatedText = function (en) {
         toKatakana(displayName(c.id, c.name, 'ja')).includes(query))
       .sort((a, b) => displayName(a.id, a.name).localeCompare(displayName(b.id, b.name), currentLang));
     const cities = query ? searchCities(query) : [];
+    const foundTags = searchTags(query);
     const el = document.getElementById('search-results');
-    if (results.length === 0 && cities.length === 0) {
+    if (results.length === 0 && cities.length === 0 && foundTags.length === 0) {
       el.innerHTML = `<div class="search-empty">${escapeHtml(t('searchEmpty'))}</div>`;
       return;
     }
@@ -8169,13 +8561,28 @@ window.dataUpdatedText = function (en) {
         ${count > 0 ? `<span class="search-result-count">${t('searchResultTrips')(count)}</span>` : ''}
       </div>`;
     }).join('');
+    // タグで探す。＃をつけてもつけなくても見つかる
+    const tagRows = foundTags.map(({ tag, n }) =>
+      `<div class="search-result" data-tag="${escapeHtml(tag)}">
+        <span class="search-result-flag" aria-hidden="true">#</span>
+        <span>${escapeHtml(tag)}</span>
+        <span class="search-result-count">${escapeHtml(t('searchResultTagged')(n))}</span>
+      </div>`).join('');
     if (!query) {
       el.innerHTML = countryRows;
     } else {
       el.innerHTML =
+        (tagRows ? `<div class="search-group-label">${escapeHtml(t('searchTags'))}</div>${tagRows}` : '') +
         (countryRows ? `<div class="search-group-label">${escapeHtml(t('searchCountries'))}</div>${countryRows}` : '') +
         (cityRows ? `<div class="search-group-label">${escapeHtml(t('searchCities'))}</div>${cityRows}` : '');
     }
+    el.querySelectorAll('.search-result[data-tag]').forEach(row => {
+      row.addEventListener('click', () => {
+        const tag = row.getAttribute('data-tag');
+        closeSearch();
+        openTagList(tag);
+      });
+    });
     el.querySelectorAll('.search-result').forEach(row => {
       row.addEventListener('click', () => {
         const id = row.getAttribute('data-country-id');
@@ -8186,6 +8593,77 @@ window.dataUpdatedText = function (en) {
         sheetFromSearch = query;
       });
     });
+  }
+
+  // 打った字に合うタグ（世界と日本の両方から）
+  //   検索欄はひらがなをカタカナに直してから渡ってくるので、タグ側も同じにそろえて比べる
+  function searchTags(query) {
+    if (!window.tagAPI) return [];
+    const q = toKatakana(String(query || '').normalize('NFKC').trim().toLowerCase());
+    if (!q) return [];
+    return window.tagAPI.counts()
+      .filter(x => toKatakana(x.tag.normalize('NFKC').toLowerCase()).indexOf(q) >= 0)
+      .slice(0, 12);
+  }
+
+  // タグのついた記録を、世界と日本をまとめて一覧で出す
+  function openTagList(tag) {
+    const el = document.getElementById('list-results');
+    const rows = [];
+    const esc = escapeHtml;
+    // 世界の記録
+    (state.visits || []).forEach(v => {
+      if (!(v.tags || []).includes(tag)) return;
+      const flag = flagFor(v.countryId) || '';
+      const where = [displayName(v.countryId, v.countryName), visitCities(v).map(cityLabel).join('・')]
+        .filter(Boolean).join(' · ');
+      rows.push({ date: v.date || '', html:
+        `<div class="search-result" data-country-id="${v.countryId}" data-country-name="${esc(v.countryName)}">
+          ${flag ? `<span class="search-result-flag">${flag}</span>` : ''}
+          <span>${esc(where)}</span>
+          <span class="search-result-sub">${v.date ? esc(formatDate(v.date)) : esc(t('noDate'))}</span>
+        </div>` });
+    });
+    // 日本の記録（日本の画面をまだ開いていなくても出せるよう、保存されている中身から直接読む）
+    try {
+      const jp = JSON.parse(localStorage.getItem('your-travels-japan-v1') || 'null');
+      const N = window.JP_NAMES || {}, R = window.JP_RAIL || {};
+      const pref = c => (N.prefectures || {})[c] || '';
+      const muni = c => (N.municipalities || {})[c] || '';
+      (jp && jp.visits || []).forEach(v => {
+        if (!(v.tags || []).includes(tag)) return;
+        let where = '';
+        if (v.airportCode) { const ap = (R.airports || {})[v.airportCode]; where = ap ? ap.name : ''; }
+        else if (v.stationCode) { const st = (R.stations || {})[v.stationCode]; where = st ? st.name + '駅' : ''; }
+        else {
+          const codes = Array.isArray(v.cityCodes) && v.cityCodes.length ? v.cityCodes : (v.cityCode ? [v.cityCode] : []);
+          where = codes.map(muni).filter(Boolean).join('・');
+        }
+        const name = [pref(v.prefCode), where].filter(Boolean).join(' · ');
+        if (!name) return;
+        rows.push({ date: v.date || '', html:
+          `<div class="search-result" data-jp="1">
+            <span class="search-result-flag" aria-hidden="true">\u{1F5FE}</span>
+            <span>${esc(name)}</span>
+            <span class="search-result-sub">${v.date ? esc(formatDate(v.date)) : esc(t('noDate'))}</span>
+          </div>` });
+      });
+    } catch (e) {}
+    rows.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    document.getElementById('list-label').textContent = t('searchTags');
+    document.getElementById('list-title').textContent = window.tagAPI.label(tag);
+    el.innerHTML = rows.length
+      ? rows.map(r => r.html).join('')
+      : `<div class="search-empty">${esc(t('tagListEmpty'))}</div>`;
+    el.querySelectorAll('.search-result[data-country-id]').forEach(row => {
+      row.addEventListener('click', () => {
+        const id = row.getAttribute('data-country-id');
+        const name = row.getAttribute('data-country-name');
+        document.getElementById('list-modal').classList.remove('show');
+        openSheet(id, name);
+      });
+    });
+    document.getElementById('list-modal').classList.add('show');
   }
 
   // Built-in cities plus any city the user has recorded
@@ -11425,6 +11903,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
             ${window.kindAPI ? `<div class="visit-kind-tag">${escapeHtml(window.kindAPI.kindLabel(window.kindAPI.kindOf(v)))}</div>` : ''}
             ${placeName(v) ? `<div class="visit-city">${escapeHtml(placeName(v))}</div>` : ''}
             <div class="visit-date${v.date ? '' : ' no-date'}${placeName(v) ? '' : ' primary'}">${v.date ? formatDate(v.date) : (!currentLangIsEnSafe() ? '日付なし' : 'No date')}</div>
+            ${window.tagAPI ? window.tagAPI.chips(v) : ''}
             ${v.note ? `<div class="visit-note">${escapeHtml(jpNote(v.note))}</div>` : ''}
             ${(v.photos || []).length ? `<div class="visit-photos">${v.photos.slice(0, 4).map(id => `<span class="v-ph"><img data-photo="${id}" alt=""></span>`).join('')}</div>` : ''}
             ${v.ig ? `<a class="ig-link" href="${escapeHtml(v.ig)}" target="_blank" rel="noopener">${currentLangIsEnSafe() ? 'View on Instagram' : 'Instagramで見る'} ›</a>` : ''}
@@ -11542,7 +12021,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   // 日本の地図ができた時点で、いちど反映しておく
   window.applyJapanDetail();
 
-  function addVisit(date, note, ig, photos, kind, munis) {
+  function addVisit(date, note, ig, photos, kind, munis, tags) {
     if (!currentContext) return;
     const { prefCode, cityCode, stationCode, airportCode } = currentContext;
     const list = (munis || []).filter(Boolean);
@@ -11556,6 +12035,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
       date: date || '',
       note: note || '',
       kind: kind || (window.kindAPI ? window.kindAPI.KIND_DEFAULT : 'stay'),
+      tags: tags || [],
       ...(ig ? { ig: ig } : {}),
       ...(photos && photos.length ? { photos } : {})
     };
@@ -11597,6 +12077,15 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
   }
 
   // Re-render the current view (national / prefecture / rail) preserving user location
+  // タグを整理したあと、日本の記録も出し直す
+  window.jpRefreshAfterTags = function () {
+    try {
+      const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      if (raw && Array.isArray(raw.visits)) state.visits = raw.visits;
+      rerenderCurrentView();
+      if (typeof renderSheetContent === 'function') renderSheetContent();
+    } catch (e) {}
+  };
   function rerenderCurrentView() {
     if (currentView === 'rail') {
       renderRail();
@@ -11631,12 +12120,14 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     }
   }
 
+  const jTags = window.tagAPI ? window.tagAPI.wire('jp-form-tags', 'jp-tag-suggest', 'jp-tag-picked') : null;
   function showAddForm() {
     // 世界の記録と同じ入力ポップアップを使う
     const place = document.getElementById('jp-sheet-region');
     document.getElementById('jp-form-place').textContent = place ? place.textContent : '';
     document.getElementById('jp-form-date').value = localDateStr();
     document.getElementById('jp-form-note').value = '';
+    if (jTags) jTags.clear();
     document.getElementById('jp-form-ig').value = '';
     if (window.photoAPI) { window.photoAPI.use('jp-photo-pick'); window.photoAPI.clear(); }
     pickedJpKind = window.kindAPI ? window.kindAPI.KIND_DEFAULT : 'stay';
@@ -11668,6 +12159,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     document.getElementById('jp-form-date').value = v.date || '';
     document.getElementById('jp-form-note').value = v.note || '';
     document.getElementById('jp-form-ig').value = v.ig || '';
+    if (jTags) jTags.set(v.tags);
     pickedJpKind = (window.kindAPI ? window.kindAPI.kindOf(v) : 'stay');
     pickedMuni = Array.isArray(v.cityCodes) && v.cityCodes.length ? v.cityCodes.slice() : (v.cityCode ? [v.cityCode] : []);
     document.getElementById('jp-form-muni').value = '';
@@ -11729,6 +12221,7 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
         if (ig) v.ig = ig; else delete v.ig;
         if (photos.length) v.photos = photos; else delete v.photos;
         v.kind = pickedJpKind;
+        v.tags = jTags ? jTags.get() : [];
         v.cityCodes = pickedMuni.slice();
         v.cityCode = pickedMuni[0] || v.cityCode || null;
         save();
@@ -11739,7 +12232,8 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     } else {
       addVisit(document.getElementById('jp-form-date').value,
                document.getElementById('jp-form-note').value.trim(),
-               document.getElementById('jp-form-ig').value.trim(), photos, pickedJpKind, pickedMuni);
+               document.getElementById('jp-form-ig').value.trim(), photos, pickedJpKind, pickedMuni,
+               jTags ? jTags.get() : []);
     }
     closeJpForm();
   });
