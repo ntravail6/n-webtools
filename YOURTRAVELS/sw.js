@@ -2,7 +2,7 @@
 //   ・初めて開いたときに、アプリのファイルを端末に取っておく
 //   ・次からは、取っておいたものをすぐ出す（電波がなくても開ける）
 //   ・新しい版を出したら、下の CACHE_NAME の数字を1つ増やす
-const CACHE_NAME = 'yourtravels-v33';
+const CACHE_NAME = 'yourtravels-v34';
 
 // 取っておくファイル
 const FILES = [
