@@ -8593,6 +8593,8 @@ window.dataUpdatedText = function (en) {
     showIntro(false);
   });
   document.getElementById('about-open').addEventListener('click', () => { showIntro(true); window.scrollTo(0, 0); });
+  // Googleにログインできたとき、最初の画面を閉じるために使う
+  window.closeIntroShared = () => showIntro(false);
   document.getElementById('list-back').addEventListener('click', closeList);
   document.getElementById('list-modal').addEventListener('click', e => {
     if (e.target === document.getElementById('list-modal')) closeList();
@@ -9470,13 +9472,26 @@ window.dataUpdatedText = function (en) {
       return (j && j.email) || '';
     }
 
+    // この置き場所にあるものを、ぜんぶ数えあげる
+    //   （以前の作りで同じ名前のものが増えてしまうことがあったため）
+    async function listFiles() {
+      const r = await api('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder' +
+                          '&fields=files(id,name,modifiedTime)&pageSize=100' +
+                          '&orderBy=modifiedTime desc');
+      const j = await r.json();
+      return (j.files || []).filter(f => f.name === FILE);
+    }
     async function findFile() {
       if (fileId) return fileId;
-      const q = encodeURIComponent("name='" + FILE + "'");
-      const r = await api('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=' + q +
-                          '&fields=files(id,modifiedTime)&pageSize=1');
-      const j = await r.json();
-      fileId = (j.files && j.files[0] && j.files[0].id) || null;
+      const list = await listFiles();
+      fileId = (list[0] && list[0].id) || null;   // いちばん新しいものを使う
+      // 余分なものが残っていたら、ここで片づける
+      if (list.length > 1) {
+        for (let i = 1; i < list.length; i++) {
+          try { await api('https://www.googleapis.com/drive/v3/files/' + list[i].id, { method: 'DELETE' }); }
+          catch (e) {}
+        }
+      }
       return fileId;
     }
 
@@ -9585,32 +9600,39 @@ window.dataUpdatedText = function (en) {
       // 先に知らせる（このあとの保存に少し時間がかかるため）
       alert(t('googleDone')(mail()));
       const here = pack();
+      let took = false;                       // ドライブの中身を取り込んだか
       if (remote && !isEmpty(remote) && !isEmpty(here) && !same(remote, here)) {
         // 端末とドライブで中身が違う。1回だけ聞く。
         //   OK ＝ Googleドライブのものを使う（ほかの端末で書いたものが消えない、安全なほう）
-        if (confirm(t('googlePick'))) unpack(remote);
+        if (confirm(t('googlePick'))) { unpack(remote); took = true; }
         else {
           // この端末のものを使う＝ドライブを置きかえる。もう一度だけ確かめる
-          if (!confirm(t('googlePickSure'))) { unpack(remote); }
+          if (!confirm(t('googlePickSure'))) { unpack(remote); took = true; }
           else { try { await save(true); } catch (e) { alert(t('googleSaveFail')); return; } }
         }
       } else if (remote && !isEmpty(remote)) {
-        unpack(remote);
+        unpack(remote); took = true;
       } else {
         try { await save(true); } catch (e) { alert(t('googleSaveFail')); }
       }
-      // ログインできたら、選ぶ画面は用ずみ。開き直して地図から始める
-      location.reload();
+      render();
+      // ドライブの中身に入れかえたときだけ、開き直す（読み直しが要るため）。
+      // そうでなければ、最初の画面を閉じるだけにして、待たせない
+      if (took) location.reload();
+      else if (window.closeIntroShared) window.closeIntroShared();
     }
 
     // Googleドライブに預けた控えを消す
     async function wipe() {
       try {
-        const id = await findFile();
-        if (!id) return true;                       // もともと無ければ、消すものがない
-        await api('https://www.googleapis.com/drive/v3/files/' + id, { method: 'DELETE' });
+        const list = await listFiles();
+        for (const f of list) {
+          await api('https://www.googleapis.com/drive/v3/files/' + f.id, { method: 'DELETE' });
+        }
         fileId = null;
-        return true;
+        // 本当に無くなったか、もう一度見にいく
+        const rest = await listFiles();
+        return rest.length === 0;
       } catch (e) { return false; }
     }
 
@@ -9696,11 +9718,17 @@ window.dataUpdatedText = function (en) {
     let prompt = null;
     window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); prompt = e; });
 
-    // 開いた回数を数える
+    // 開いた回数を数える。
+    //   ログインのあとの開き直しなど、同じ回のうちの読み直しでは増やさない。
     let opens = parseInt(get(CNT) || '0', 10);
     if (!Number.isFinite(opens)) opens = 0;
-    opens += 1;
-    set(CNT, String(opens));
+    let counted = false;
+    try { counted = !!sessionStorage.getItem('yourtravels-counted'); } catch (e) {}
+    if (!counted) {
+      opens += 1;
+      set(CNT, String(opens));
+      try { sessionStorage.setItem('yourtravels-counted', '1'); } catch (e) {}
+    }
 
     function close() { box.hidden = true; }
     function later() {
