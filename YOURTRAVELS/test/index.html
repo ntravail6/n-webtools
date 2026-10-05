@@ -5833,6 +5833,8 @@ window.dataUpdatedText = function (en) {
       introClose: 'Close',
       googleSoon: 'Google sign-in is not ready yet. For now, your records are kept on this device.',
       googleFail: 'Could not reach Google. Please check your connection and try again.',
+      googleReadFail: 'Could not read what is in your Google Drive. Please check your connection and try again.\n\nNothing has been changed, so the records on your other devices are safe.',
+      googleSaveFail: 'Could not save to Google Drive. Please check your connection. It will be saved again the next time you change something.',
       googleNoDrive: 'Google Drive was not allowed, so your records cannot be kept there.\n\nPlease sign in again and tick the Google Drive box.\nFor now, your records stay on this device.',
       googleOn: m => 'Using Google Drive · ' + m,
       googleOut: 'Sign out of Google',
@@ -5840,7 +5842,8 @@ window.dataUpdatedText = function (en) {
       googleOutBusy: 'The latest change has not reached Google Drive yet. Please check your connection and try again in a moment.',
       googleOutDone: 'Signed out. Your records stay in your Google Drive.',
       googleDone: m => 'Signed in as ' + m + '. Your records are now kept in your Google Drive.',
-      googlePick: 'There are different records on this device and in your Google Drive.\n\nWhich do you want to carry on with? The other one is replaced.\n\nOK — the records on this device\nCancel — the records in your Google Drive',
+      googlePick: 'Your Google Drive has records made on another device, and this device has different ones.\n\nOK — use the records in your Google Drive (recommended)\nCancel — use the records on this device instead',
+      googlePickSure: 'The records in your Google Drive will be replaced by the ones on this device.\n\nWhat other devices have saved will be lost. Are you sure?',
       googleSavedAt: d => 'saved ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       setGoogleSub: 'Keep your records in your own Google Drive, so you can use them on any device.',
       setPrivacy: 'Privacy policy',
@@ -6115,6 +6118,8 @@ window.dataUpdatedText = function (en) {
       introClose: '閉じる',
       googleSoon: 'Google ログインは準備中です。いまは、この端末に記録を保存して使えます。',
       googleFail: 'Google につながりませんでした。通信を確かめて、もう一度お試しください。',
+      googleReadFail: 'Googleドライブの中身を読めませんでした。通信を確かめて、もう一度お試しください。\n\n何も書きかえていませんので、ほかの端末の記録は無事です。',
+      googleSaveFail: 'Googleドライブに保存できませんでした。通信を確かめてください。次に何か記録を直したときに、もう一度保存します。',
       googleNoDrive: 'Googleドライブへの許可にチェックが入らなかったため、記録を預けられません。\n\nもう一度ログインして、Googleドライブのチェックを入れてください。\nいまは、この端末に記録を保存して使えます。',
       googleOn: m => 'Googleドライブで使用中 · ' + m,
       googleOut: 'Google からログアウト',
@@ -6122,7 +6127,8 @@ window.dataUpdatedText = function (en) {
       googleOutBusy: 'いちばん新しい変更が、まだGoogleドライブに届いていません。通信を確かめて、少し待ってからもう一度お試しください。',
       googleOutDone: 'ログアウトしました。記録はGoogleドライブに残っています。',
       googleDone: m => m + 'でログインしました。これから記録はGoogleドライブに保存されます。',
-      googlePick: 'この端末とGoogleドライブに、別々の記録があります。\n\nどちらを続けて使いますか？もう片方は置きかわります。\n\nOK → この端末の記録を使う\nキャンセル → Googleドライブの記録を使う',
+      googlePick: 'Googleドライブに、ほかの端末で書いた記録があります。この端末には、それとは別の記録があります。\n\nOK → Googleドライブの記録を使う（おすすめ）\nキャンセル → この端末の記録を使う',
+      googlePickSure: 'Googleドライブの記録が、この端末の記録に置きかわります。\n\nほかの端末で書いた記録は消えます。よろしいですか？',
       googleSavedAt: d => d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' に保存',
       setGoogleSub: '記録をGoogleドライブに保存して、どの端末でも同じ記録を使えます。',
       setPrivacy: 'プライバシーポリシー',
@@ -9546,14 +9552,16 @@ window.dataUpdatedText = function (en) {
       clearTimeout(timer);
       timer = setTimeout(() => { save(); }, 2500);
     }
-    async function save() {
+    async function save(loud) {
       if (!mail()) return;
       if (busy) { again = true; return; }
       busy = true;
+      let err = null;
       try { await push(); }
-      catch (e) { /* つながらないときは、次の変更でまた送る */ }
+      catch (e) { err = e; }          // つながらないときは、次の変更でまた送る
       busy = false;
       if (again) { again = false; schedule(); }
+      if (err && loud) throw err;
     }
 
     async function signIn() {
@@ -9563,23 +9571,32 @@ window.dataUpdatedText = function (en) {
         if (e && e.message === 'no-drive') alert(t('googleNoDrive'));
         return;                                                  // やめた場合は何も言わない
       }
+      // ── Googleドライブの中身を読む。
+      //    読めなかったときは、ここで止める。
+      //    （読めたと思いこんで端末のものを書き込むと、ほかの端末の記録が消えてしまう）
+      let remote = null;
+      try { remote = await pull(); }
+      catch (e) { alert(t('googleReadFail')); return; }
       let who = '';
       try { who = await whoami(); } catch (e) {}
       setMail(who || 'google');
-      let remote = null;
-      try { remote = await pull(); } catch (e) {}
+      // 先に知らせる（このあとの保存に少し時間がかかるため）
+      alert(t('googleDone')(mail()));
       const here = pack();
       if (remote && !isEmpty(remote) && !isEmpty(here) && !same(remote, here)) {
-        // 端末とドライブで中身が違う。どちらを続けるか1回だけ聞く
-        if (confirm(t('googlePick'))) await save();           // 端末のものを使う
-        else { unpack(remote); location.reload(); return; }   // ドライブのものを使う
+        // 端末とドライブで中身が違う。1回だけ聞く。
+        //   OK ＝ Googleドライブのものを使う（ほかの端末で書いたものが消えない、安全なほう）
+        if (confirm(t('googlePick'))) unpack(remote);
+        else {
+          // この端末のものを使う＝ドライブを置きかえる。もう一度だけ確かめる
+          if (!confirm(t('googlePickSure'))) { unpack(remote); }
+          else { try { await save(true); } catch (e) { alert(t('googleSaveFail')); return; } }
+        }
       } else if (remote && !isEmpty(remote)) {
-        unpack(remote); location.reload(); return;
+        unpack(remote);
       } else {
-        await save();
+        try { await save(true); } catch (e) { alert(t('googleSaveFail')); }
       }
-      render();
-      alert(t('googleDone')(mail()));
       // ログインできたら、選ぶ画面は用ずみ。開き直して地図から始める
       location.reload();
     }
