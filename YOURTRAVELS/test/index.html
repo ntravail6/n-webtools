@@ -5216,7 +5216,7 @@ window.dataUpdatedText = function (en) {
     </div>
 
     <div id="reset-step2" hidden>
-      <p class="reset-note" data-i18n="resetLast">This is the last check. Once deleted, the records are gone from this device. You can still use &quot;Undo the last change&quot; right afterwards, but a backup is the sure way.</p>
+      <p class="reset-note" id="reset-last" data-i18n="resetLast">This is the last check. Once deleted, the records are gone from this device. You can still use &quot;Undo the last change&quot; right afterwards, but a backup is the sure way.</p>
       <div class="reset-actions">
         <button type="button" class="set-danger" id="reset-do" data-i18n="resetDo">Delete everything</button>
         <button type="button" class="foot-link muted" id="reset-cancel2" data-i18n="resetCancel">Cancel</button>
@@ -5672,6 +5672,7 @@ window.dataUpdatedText = function (en) {
       resetItem4: 'The photos you added',
       resetItem5: 'The records kept in your Google Drive',
       resetDriveFail: 'The records in Google Drive could not be deleted. Please check your connection and try again. Nothing has been deleted yet.',
+      resetLastDrive: 'This is the last check. Everything on this device and in your Google Drive is deleted, and you are signed out. This cannot be undone, so save a backup first if you are unsure.',
       resetBackupNote: 'Save a backup first to be safe. You can bring everything back later with "Load a backup".',
       resetLast: 'This is the last check. Once deleted, the records are gone from this device. You can still use "Undo the last change" right afterwards, but a backup is the sure way.',
       resetNext: 'Go on to delete',
@@ -5953,6 +5954,7 @@ window.dataUpdatedText = function (en) {
       resetItem4: '入れた写真',
       resetItem5: 'Googleドライブに保存されている記録',
       resetDriveFail: 'Googleドライブの記録を消せませんでした。通信を確かめて、もう一度お試しください。まだ何も消していません。',
+      resetLastDrive: 'これが最後の確認です。この端末とGoogleドライブの記録をすべて消して、ログアウトします。取り消せませんので、心配なときは先にバックアップを保存してください。',
       resetBackupNote: '消す前にバックアップを保存しておくと安心です。あとから「バックアップを読み込む」で元に戻せます。',
       resetLast: 'これが最後の確認です。削除すると、記録はこの端末から消えます。すぐなら「最後の操作を取り消す」で戻せますが、確実なのはバックアップです。',
       resetNext: '削除に進む',
@@ -8341,13 +8343,18 @@ window.dataUpdatedText = function (en) {
     if (!m) return;
     new MutationObserver(() => {
       if (!m.classList.contains('show')) return;
+      const on = !!(window.gdriveAPI && window.gdriveAPI.on());
       const row = document.getElementById('reset-item-drive');
-      if (row) row.hidden = !(window.gdriveAPI && window.gdriveAPI.on());
+      if (row) row.hidden = !on;
+      // ログイン中は取り消しも残さないので、最後の確認の文も変える
+      const last = document.getElementById('reset-last');
+      if (last) last.textContent = t(on ? 'resetLastDrive' : 'resetLast');
     }).observe(m, { attributes: true, attributeFilter: ['class'] });
   })();
   document.getElementById('reset-do').addEventListener('click', async () => {
     // ログイン中なら、Googleドライブの記録も先に消す
-    if (window.gdriveAPI && window.gdriveAPI.on()) {
+    const wasOn = !!(window.gdriveAPI && window.gdriveAPI.on());
+    if (wasOn) {
       const ok = await window.gdriveAPI.wipe();
       if (!ok) { alert(t('resetDriveFail')); return; }
       window.gdriveAPI.signOutQuiet();
@@ -8356,6 +8363,8 @@ window.dataUpdatedText = function (en) {
     closeResetModal();
     document.getElementById('reset').click();
     resetConfirmed = false;
+    // Googleドライブまで消したときは、取り消しも残さない
+    if (wasOn && window.undoAPI && window.undoAPI.clear) window.undoAPI.clear();
   });
   document.getElementById('undo-btn').addEventListener('click', () => window.undoAPI && window.undoAPI.undo());
   document.getElementById('set-undo').addEventListener('click', () => window.undoAPI && window.undoAPI.undo());
@@ -9862,7 +9871,15 @@ var QRCode;!function(){function a(a){this.mode=c.MODE_8BIT_BYTE,this.data=a,this
     location.reload();
     return true;
   }
-  window.undoAPI = { push: pushUndo, undo: undoLast, count: () => loadUndo().length };
+  // ログイン中に「すべて削除」したときは、取り消しも残さない
+  //   （Googleドライブまで消したのに、端末だけ戻せるのは紛らわしいため）
+  function clearUndo() {
+    try { localStorage.removeItem(UNDO_KEY); } catch (e) {}
+    updateUndoRow();
+    const el = document.getElementById('undo-toast');
+    if (el) el.classList.remove('show');
+  }
+  window.undoAPI = { push: pushUndo, undo: undoLast, clear: clearUndo, count: () => loadUndo().length };
   window.updateUndoRowShared = () => updateUndoRow();
 
   window.toastMainShared = msg => toast(msg);
