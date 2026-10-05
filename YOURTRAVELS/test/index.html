@@ -3953,6 +3953,43 @@
     text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(156, 136, 120, 0.4); }
   .intro-demo:hover { color: var(--text); }
   .intro-demo[hidden], .intro-google[hidden], .intro-go[hidden] { display: none; }
+  /* ホーム画面に置く案内（下から出る） */
+  .a2hs { position: fixed; inset: 0; z-index: 700; display: flex; align-items: flex-end;
+    background: rgba(90, 71, 56, 0.28); }
+  .a2hs[hidden] { display: none; }
+  .a2hs-card { width: 100%; background: var(--surface); border-radius: 20px 20px 0 0;
+    padding: 10px 20px calc(20px + env(safe-area-inset-bottom)); box-sizing: border-box;
+    box-shadow: 0 -8px 30px rgba(90, 71, 56, 0.18);
+    animation: a2hsUp 0.32s cubic-bezier(0.4, 0, 0.2, 1); }
+  @keyframes a2hsUp { from { transform: translateY(100%); } to { transform: none; } }
+  .a2hs-grip { width: 36px; height: 4px; border-radius: 99px; background: var(--border-strong);
+    margin: 0 auto 16px; }
+  .a2hs-row { display: flex; gap: 14px; align-items: flex-start; }
+  .a2hs-ico { font-size: 24px; line-height: 1.2; flex: none; }
+  .a2hs-txt { flex: 1; min-width: 0; }
+  .a2hs-ttl { font-family: var(--font-jp); font-size: 15.5px; font-weight: 500; color: var(--text);
+    line-height: 1.6; }
+  .a2hs-sub { font-size: 12.5px; line-height: 1.75; color: var(--text-muted); margin: 5px 0 0;
+    text-wrap: pretty; }
+  .a2hs-steps { list-style: none; counter-reset: a 0; margin: 11px 0 0; padding: 0; }
+  .a2hs-steps[hidden] { display: none; }
+  .a2hs-steps li { counter-increment: a; position: relative; padding-left: 24px;
+    font-size: 12.5px; line-height: 1.8; color: var(--text-sub); }
+  .a2hs-steps li::before { content: counter(a); position: absolute; left: 0; top: 4px;
+    width: 16px; height: 16px; border-radius: 50%; background: var(--v0); color: var(--v4);
+    font-size: 10px; line-height: 16px; text-align: center; }
+  .a2hs-btns { display: flex; gap: 10px; align-items: center; justify-content: flex-end;
+    margin-top: 18px; }
+  .a2hs-later { background: none; border: none; font-family: var(--font); font-size: 13px;
+    color: var(--text-muted); padding: 12px 14px; cursor: pointer; }
+  .a2hs-go { flex: none; min-height: 44px; padding: 0 22px; border: none; border-radius: 100px;
+    background: var(--v3); color: #fff; font-family: var(--font); font-size: 14px;
+    letter-spacing: 0.08em; cursor: pointer; }
+  @media (max-width: 345px) {
+    .a2hs-card { padding-left: 16px; padding-right: 16px; }
+    .a2hs-go { padding: 0 16px; font-size: 13px; }
+    .a2hs-later { padding: 12px 8px; }
+  }
   /* 上半分：できることを6つ並べる */
   .intro-six { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 10px;
     width: 100%; margin-top: 36px; }
@@ -4808,6 +4845,28 @@ window.dataUpdatedText = function (en) {
   </div>
 
 
+</div>
+
+<!-- ホーム画面に置く案内（2回目に開いたときだけ、下から出る） -->
+<div class="a2hs" id="a2hs" hidden>
+  <div class="a2hs-card">
+    <div class="a2hs-grip" aria-hidden="true"></div>
+    <div class="a2hs-row">
+      <span class="a2hs-ico" aria-hidden="true">📍</span>
+      <div class="a2hs-txt">
+        <div class="a2hs-ttl" data-i18n="a2hsTitle">Keep it on your home screen</div>
+        <p class="a2hs-sub" data-i18n="a2hsSub">It opens like an app, full screen, and works without a signal.</p>
+        <ol class="a2hs-steps" id="a2hs-steps" hidden>
+          <li data-i18n="a2hsStep1">Tap the share button below</li>
+          <li data-i18n="a2hsStep2">Choose &quot;Add to Home Screen&quot;</li>
+        </ol>
+      </div>
+    </div>
+    <div class="a2hs-btns">
+      <button type="button" class="a2hs-later" id="a2hs-later" data-i18n="a2hsLater">Later</button>
+      <button type="button" class="a2hs-go" id="a2hs-go" data-i18n="a2hsOk">Got it</button>
+    </div>
+  </div>
 </div>
 
 <!-- Photo viewer -->
@@ -5759,7 +5818,14 @@ window.dataUpdatedText = function (en) {
       canWish: 'Wishlist',  canWishSub: 'Places you want\nto go next',
       canPhoto: 'Photos',   canPhotoSub: 'Add photos and\na few words',
       canBadge: 'Badges',   canBadgeSub: 'Collect them\nas you travel',
-      introDemoWhy: 'Try it with records already in. Nothing is saved.',
+      introDemoWhy: 'See in detail what the app can do.\nNothing is saved.',
+      a2hsTitle: 'Keep it on your home screen',
+      a2hsSub: 'It opens like an app, full screen, and works without a signal.',
+      a2hsStep1: 'Tap the share button below',
+      a2hsStep2: 'Choose "Add to Home Screen"',
+      a2hsLater: 'Later',
+      a2hsOk: 'Got it',
+      a2hsAdd: 'Add to home screen',
       googleSoon: 'Google sign-in is not ready yet. For now, your records are kept on this device.',
       googleFail: 'Could not reach Google. Please check your connection and try again.',
       googleNoDrive: 'Google Drive was not allowed, so your records cannot be kept there.\n\nPlease sign in again and tick the Google Drive box.\nFor now, your records stay on this device.',
@@ -5769,7 +5835,7 @@ window.dataUpdatedText = function (en) {
       googleOutBusy: 'The latest change has not reached Google Drive yet. Please check your connection and try again in a moment.',
       googleOutDone: 'Signed out. Your records stay in your Google Drive.',
       googleDone: m => 'Signed in as ' + m + '. Your records are now kept in your Google Drive.',
-      googleMove: 'Move the records on this device into your Google Drive?\n\nOK — move them (you carry on with the same records)\nCancel — do not move them (the records already in Google Drive are used)',
+      googlePick: 'There are different records on this device and in your Google Drive.\n\nWhich do you want to carry on with? The other one is replaced.\n\nOK — the records on this device\nCancel — the records in your Google Drive',
       googleSavedAt: d => 'saved ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       setGoogleSub: 'Keep your records in your own Google Drive, so you can use them on any device.',
       setPrivacy: 'Privacy policy',
@@ -6032,7 +6098,14 @@ window.dataUpdatedText = function (en) {
       canWish: '行きたい',    canWishSub: '次に行く場所を\n残しておく',
       canPhoto: '写真とメモ', canPhotoSub: '記録に写真と\nひとことを',
       canBadge: 'バッジ',     canBadgeSub: '集めて\n旅をふりかえる',
-      introDemoWhy: '記録が入った状態でさわれます。何も保存されません。',
+      introDemoWhy: '何ができるか詳しく見ることができます。\n何も保存されません。',
+      a2hsTitle: 'ホーム画面に置けます',
+      a2hsSub: 'アイコンから開けて、全画面になります。電波がなくても開けます。',
+      a2hsStep1: '下の「共有」を押す',
+      a2hsStep2: '「ホーム画面に追加」をえらぶ',
+      a2hsLater: 'あとで',
+      a2hsOk: 'わかりました',
+      a2hsAdd: 'ホーム画面に置く',
       googleSoon: 'Google ログインは準備中です。いまは、この端末に記録を保存して使えます。',
       googleFail: 'Google につながりませんでした。通信を確かめて、もう一度お試しください。',
       googleNoDrive: 'Googleドライブへの許可にチェックが入らなかったため、記録を預けられません。\n\nもう一度ログインして、Googleドライブのチェックを入れてください。\nいまは、この端末に記録を保存して使えます。',
@@ -6042,7 +6115,7 @@ window.dataUpdatedText = function (en) {
       googleOutBusy: 'いちばん新しい変更が、まだGoogleドライブに届いていません。通信を確かめて、少し待ってからもう一度お試しください。',
       googleOutDone: 'ログアウトしました。記録はGoogleドライブに残っています。',
       googleDone: m => m + 'でログインしました。これから記録はGoogleドライブに保存されます。',
-      googleMove: 'この端末の記録を、Googleドライブに移しますか？\n\nOK → 移す（これまでの記録をそのまま使えます）\nキャンセル → 移さない（Googleドライブにある記録を使います）',
+      googlePick: 'この端末とGoogleドライブに、別々の記録があります。\n\nどちらを続けて使いますか？もう片方は置きかわります。\n\nOK → この端末の記録を使う\nキャンセル → Googleドライブの記録を使う',
       googleSavedAt: d => d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' に保存',
       setGoogleSub: '記録をGoogleドライブに保存して、どの端末でも同じ記録を使えます。',
       setPrivacy: 'プライバシーポリシー',
@@ -8380,9 +8453,15 @@ window.dataUpdatedText = function (en) {
     try { localStorage.setItem(ASK_KEY, '1'); } catch (e) {}
     document.getElementById('detail-modal').classList.remove('show');
   });
+  // Googleドライブで使っている人は、もう選んであるので最初の画面を出さない
+  function signedIn() {
+    try { return !!localStorage.getItem('yourtravels-google-mail'); } catch (e) { return false; }
+  }
   try {
-    if (!sessionStorage.getItem(INTRO_KEY)) showIntro(true);
-    else { document.documentElement.classList.remove('pre-intro'); maybeAskDetail(); }
+    if (signedIn() || sessionStorage.getItem(INTRO_KEY)) {
+      document.documentElement.classList.remove('pre-intro');
+      maybeAskDetail();
+    } else showIntro(true);
   } catch(e) { showIntro(true); }
   // ボタンを出さないときは、その下の説明も出さない（お試し版で文だけ残らないように）
   function hideWhy(id) { const p = document.getElementById(id); if (p) p.hidden = true; }
@@ -9373,6 +9452,16 @@ window.dataUpdatedText = function (en) {
       return true;
     }
 
+    // 中身が同じかどうか（同じなら、どちらを使うか聞く必要がない）
+    function sig(d) {
+      const pick = v => JSON.stringify([
+        (v && v.visits || []).map(x => [x.id, x.date, x.note, (x.tags || []).join(','), x.kind]).sort(),
+        (v && (v.bucketList || v.wishlist) || []).length
+      ]);
+      return pick(d && d.world) + '|' + pick(d && d.japan);
+    }
+    function same(a, b) { return sig(a) === sig(b); }
+
     function isEmpty(d) {
       if (!d) return true;
       const w = (d.world && d.world.visits) || [];
@@ -9437,9 +9526,9 @@ window.dataUpdatedText = function (en) {
       let remote = null;
       try { remote = await pull(); } catch (e) {}
       const here = pack();
-      if (remote && !isEmpty(remote) && !isEmpty(here)) {
-        // 端末にも、ドライブにも記録がある。どちらを続けるか1回だけ聞く
-        if (confirm(t('googleMove'))) await save();           // 端末のものを移す
+      if (remote && !isEmpty(remote) && !isEmpty(here) && !same(remote, here)) {
+        // 端末とドライブで中身が違う。どちらを続けるか1回だけ聞く
+        if (confirm(t('googlePick'))) await save();           // 端末のものを使う
         else { unpack(remote); location.reload(); return; }   // ドライブのものを使う
       } else if (remote && !isEmpty(remote)) {
         unpack(remote); location.reload(); return;
@@ -9517,6 +9606,92 @@ window.dataUpdatedText = function (en) {
     window.addEventListener('yt:lang', render);
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(render, 0));
     else setTimeout(render, 0);
+  })();
+</script>
+
+<script>
+  // ── ホーム画面に置く案内（2回目に開いたときだけ、下から出す）──────
+  (() => {
+    const CNT = 'yourtravels-opens';      // 何回開いたか
+    const HIDE = 'yourtravels-a2hs-hide'; // この日時まで出さない
+    const box = document.getElementById('a2hs');
+    if (!box) return;
+    const t = k => (window.t ? window.t(k) : k);
+    const get = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    const set = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+
+    // すでにホーム画面から開いている？
+    const standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches)
+      || window.navigator.standalone === true;
+    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    // スマホ・タブレットだけ（パソコンでは出さない）
+    const touch = (navigator.maxTouchPoints || 0) > 0 && innerWidth < 900;
+
+    // Android は「置く」ボタンを押せる。その合図をつかまえておく
+    let prompt = null;
+    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); prompt = e; });
+
+    // 開いた回数を数える
+    let opens = parseInt(get(CNT) || '0', 10);
+    if (!Number.isFinite(opens)) opens = 0;
+    opens += 1;
+    set(CNT, String(opens));
+
+    function close() { box.hidden = true; }
+    function later() {
+      const until = Date.now() + 14 * 24 * 60 * 60 * 1000;   // 2週間ほど出さない
+      set(HIDE, String(until));
+      close();
+    }
+    function done() { set(HIDE, String(Date.now() + 3650 * 24 * 60 * 60 * 1000)); close(); }
+
+    function show() {
+      const steps = document.getElementById('a2hs-steps');
+      const go = document.getElementById('a2hs-go');
+      if (iOS || !prompt) {
+        // iPhone はアプリ側から追加できないので、やり方を見せる
+        if (steps) steps.hidden = !iOS;
+        if (go) go.textContent = t('a2hsOk');
+        if (go) go.onclick = done;
+      } else {
+        if (steps) steps.hidden = true;
+        if (go) go.textContent = t('a2hsAdd');
+        if (go) go.onclick = async () => {
+          try { prompt.prompt(); await prompt.userChoice; } catch (e) {}
+          prompt = null; done();
+        };
+      }
+      const l = document.getElementById('a2hs-later');
+      if (l) l.onclick = later;
+      box.addEventListener('click', e => { if (e.target === box) later(); });
+      box.hidden = false;
+    }
+
+    function maybe() {
+      if (window.__DEMO__) return;             // お試し版では出さない
+      if (standalone) return;                  // もう置いてある
+      if (!touch) return;                      // パソコンでは出さない
+      if (opens < 2) return;                   // 2回目から
+      const until = parseInt(get(HIDE) || '0', 10);
+      if (Number.isFinite(until) && Date.now() < until) return;
+      // 最初の画面が出ているあいだは出さない（重ならないように）
+      const intro = document.getElementById('intro');
+      if (intro && !intro.hidden) {
+        const o = new MutationObserver(() => {
+          if (intro.hidden) { o.disconnect(); setTimeout(show, 900); }
+        });
+        o.observe(intro, { attributes: true, attributeFilter: ['hidden'] });
+        return;
+      }
+      setTimeout(show, 1200);
+    }
+
+    // Android の合図は少し遅れて来ることがあるので、待ってから出す
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(maybe, 600));
+    else setTimeout(maybe, 600);
+
+    window.a2hsAPI = { show, reset: () => { set(CNT, '1'); set(HIDE, '0'); } };
   })();
 </script>
 <script>/* qrcodejs 1.0.0 - MIT | https://github.com/davidshimjs/qrcodejs */
