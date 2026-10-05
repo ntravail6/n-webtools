@@ -3952,7 +3952,10 @@
     color: var(--text-muted); letter-spacing: 0.06em; cursor: pointer; padding: 6px 10px;
     text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(156, 136, 120, 0.4); }
   .intro-demo:hover { color: var(--text); }
-  .intro-demo[hidden], .intro-google[hidden], .intro-go[hidden] { display: none; }
+  .intro-demo[hidden], .intro-google[hidden], .intro-go[hidden],
+  .intro-more[hidden], .intro-tail[hidden], .intro-rule[hidden] { display: none; }
+  #intro-close { margin-top: 2px; }   /* 上の区切り線は .intro-rule が出している */
+  #intro-close[hidden] { display: none; }
   /* ホーム画面に置く案内（下から出る） */
   .a2hs { position: fixed; inset: 0; z-index: 700; display: flex; align-items: flex-end;
     background: rgba(90, 71, 56, 0.28); }
@@ -5828,6 +5831,7 @@ window.dataUpdatedText = function (en) {
       a2hsLater: 'Later',
       a2hsOk: 'Got it',
       a2hsAdd: 'Add to home screen',
+      introClose: 'Close',
       googleSoon: 'Google sign-in is not ready yet. For now, your records are kept on this device.',
       googleFail: 'Could not reach Google. Please check your connection and try again.',
       googleNoDrive: 'Google Drive was not allowed, so your records cannot be kept there.\n\nPlease sign in again and tick the Google Drive box.\nFor now, your records stay on this device.',
@@ -6108,6 +6112,7 @@ window.dataUpdatedText = function (en) {
       a2hsLater: 'あとで',
       a2hsOk: 'わかりました',
       a2hsAdd: 'ホーム画面に置く',
+      introClose: '閉じる',
       googleSoon: 'Google ログインは準備中です。いまは、この端末に記録を保存して使えます。',
       googleFail: 'Google につながりませんでした。通信を確かめて、もう一度お試しください。',
       googleNoDrive: 'Googleドライブへの許可にチェックが入らなかったため、記録を預けられません。\n\nもう一度ログインして、Googleドライブのチェックを入れてください。\nいまは、この端末に記録を保存して使えます。',
@@ -8437,6 +8442,35 @@ window.dataUpdatedText = function (en) {
   const ASK_KEY = 'wanderlog-detail-asked';
   function showIntro(show) {
     document.getElementById('intro').hidden = !show;
+    // Googleドライブで使っている人には、選ぶところを出さない（もう選んであるため）。
+    // この画面は「このアプリについて」として開かれるので、閉じるボタンだけにする。
+    if (show) {
+      const on = (function () {
+        try { return !!localStorage.getItem('yourtravels-google-mail'); } catch (e) { return false; }
+      })();
+      const el = id => document.getElementById(id);
+      ['intro-go', 'intro-go-why', 'intro-go-warn', 'intro-or'].forEach(id => {
+        const e = el(id); if (e) e.hidden = on;
+      });
+      const more = document.querySelector('.intro-more');
+      if (more) more.hidden = on;
+      const tail = document.querySelector('.intro-tail');
+      if (tail) tail.hidden = on;
+      let close = el('intro-close');
+      if (on && !close) {
+        close = document.createElement('button');
+        close.type = 'button';
+        close.id = 'intro-close';
+        close.className = 'btn-save intro-go';
+        close.addEventListener('click', () => showIntro(false));
+        const main = document.querySelector('.intro-main');
+        if (main) main.appendChild(close);
+      }
+      if (close) {
+        close.hidden = !on;
+        close.textContent = t('introClose');
+      }
+    }
     // 最初の画面を閉じたら、後ろの中身を見せる
     if (!show) {
       document.documentElement.classList.remove('pre-intro');
@@ -9539,6 +9573,8 @@ window.dataUpdatedText = function (en) {
       }
       render();
       alert(t('googleDone')(mail()));
+      // ログインできたら、選ぶ画面は用ずみ。開き直して地図から始める
+      location.reload();
     }
 
     // Googleドライブに預けた控えを消す
