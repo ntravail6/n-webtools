@@ -3940,7 +3940,7 @@
   .intro-google.is-soon { color: var(--text-muted); }
   /* ボタンの下に、ちがいを1行で書く */
   .intro-why { font-size: 11.5px; line-height: 1.7; color: var(--text-muted); margin: 7px 0 0;
-    text-align: center; text-wrap: pretty; }
+    text-align: center; text-wrap: pretty; white-space: pre-line; }
   .intro-why + .intro-choice, .intro-why + .intro-more { margin-top: 18px; }
   /* 「はじめる」の下だけは、消えるおそれの注意なので少し読ませる */
   .intro-why-care { max-width: 320px; margin-left: auto; margin-right: auto; }
@@ -5145,6 +5145,7 @@ window.dataUpdatedText = function (en) {
         <div class="reset-item"><span data-i18n="resetItem2">Every place on your wishlist</span></div>
         <div class="reset-item"><span data-i18n="resetItem3">Your packing list</span></div>
         <div class="reset-item"><span data-i18n="resetItem4">The photos you added</span></div>
+        <div class="reset-item" id="reset-item-drive" hidden><span data-i18n="resetItem5">The records kept in your Google Drive</span></div>
       </div>
       <p class="reset-note" data-i18n="resetBackupNote">Save a backup first to be safe. You can bring everything back later with &quot;Load a backup&quot;.</p>
       <button type="button" class="btn-save reset-backup" id="reset-backup" data-i18n="footBackup">Save a backup</button>
@@ -5609,6 +5610,8 @@ window.dataUpdatedText = function (en) {
       resetItem2: 'Every place on your wishlist',
       resetItem3: 'Your packing list',
       resetItem4: 'The photos you added',
+      resetItem5: 'The records kept in your Google Drive',
+      resetDriveFail: 'The records in Google Drive could not be deleted. Please check your connection and try again. Nothing has been deleted yet.',
       resetBackupNote: 'Save a backup first to be safe. You can bring everything back later with "Load a backup".',
       resetLast: 'This is the last check. Once deleted, the records are gone from this device. You can still use "Undo the last change" right afterwards, but a backup is the sure way.',
       resetNext: 'Go on to delete',
@@ -5749,7 +5752,7 @@ window.dataUpdatedText = function (en) {
       introDemo: 'Take a look inside',
       introGoWhy: 'Use it on this device only, without signing in.',
       introGoWarn: '* Clearing your browser data will erase your records.',
-      introGoogleWhy: 'Your records stay, even if you switch devices or clear your data.',
+      introGoogleWhy: 'Keep your records in your own Google Drive, so you can use them on any device.\nTick the box on the next screen to continue.',
       introOr: 'or',
       introNoDownload: 'No app to install — it just works here',
       canWorld: 'World',    canWorldSub: 'Colour in the countries\nyou have visited',
@@ -5761,13 +5764,16 @@ window.dataUpdatedText = function (en) {
       introDemoWhy: 'Try it with records already in. Nothing is saved.',
       googleSoon: 'Google sign-in is not ready yet. For now, your records are kept on this device.',
       googleFail: 'Could not reach Google. Please check your connection and try again.',
-      googleOn: m => 'Signed in as ' + m,
+      googleNoDrive: 'Google Drive was not allowed, so your records cannot be kept there.\n\nPlease sign in again and tick the Google Drive box.\nFor now, your records stay on this device.',
+      googleOn: m => 'Using Google Drive · ' + m,
       googleOut: 'Sign out of Google',
-      googleOutAsk: 'Sign out? The copy kept in your Google Drive is removed. The records on this device stay.',
-      googleDone: m => 'Signed in as ' + m + '. Your records will be kept in your Google Drive from now on.',
-      googleBoth: 'There are records both on this device and in your Google Drive.\n\nOK — use the ones in Google Drive (this device is overwritten)\nCancel — keep the ones on this device (Google Drive is overwritten)',
+      googleOutAsk: 'Sign out?\n\nThe records are removed from this device, but they stay in your Google Drive. Sign in again and you carry on where you left off.',
+      googleOutBusy: 'The latest change has not reached Google Drive yet. Please check your connection and try again in a moment.',
+      googleOutDone: 'Signed out. Your records stay in your Google Drive.',
+      googleDone: m => 'Signed in as ' + m + '. Your records are now kept in your Google Drive.',
+      googleMove: 'Move the records on this device into your Google Drive?\n\nOK — move them (you carry on with the same records)\nCancel — do not move them (the records already in Google Drive are used)',
       googleSavedAt: d => 'saved ' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      setGoogleSub: 'Your records stay, even if you switch devices or clear your data.',
+      setGoogleSub: 'Keep your records in your own Google Drive, so you can use them on any device.',
       setPrivacy: 'Privacy policy',
       setPrivacySub: 'What is kept, where, and what it is used for',
       tabPacking: 'Packing',
@@ -5877,6 +5883,8 @@ window.dataUpdatedText = function (en) {
       resetItem2: '行きたい場所',
       resetItem3: '持ち物リスト',
       resetItem4: '入れた写真',
+      resetItem5: 'Googleドライブに保存されている記録',
+      resetDriveFail: 'Googleドライブの記録を消せませんでした。通信を確かめて、もう一度お試しください。まだ何も消していません。',
       resetBackupNote: '消す前にバックアップを保存しておくと安心です。あとから「バックアップを読み込む」で元に戻せます。',
       resetLast: 'これが最後の確認です。削除すると、記録はこの端末から消えます。すぐなら「最後の操作を取り消す」で戻せますが、確実なのはバックアップです。',
       resetNext: '削除に進む',
@@ -6017,7 +6025,7 @@ window.dataUpdatedText = function (en) {
       introDemo: '中をのぞいてみる',
       introGoWhy: 'ログインせずに、この端末だけで使います。',
       introGoWarn: '※ ブラウザのデータを消すと、記録も消えます',
-      introGoogleWhy: '端末を変えても、データを消しても記録は残ります。',
+      introGoogleWhy: '記録をGoogleドライブに保存して、どの端末でも同じ記録を使えます。\n次の画面で、チェックを入れて進んでください。',
       introOr: 'または',
       introNoDownload: 'アプリを入れずに、このまま使えます',
       canWorld: '世界',       canWorldSub: '行った国と都市を\n地図に塗る',
@@ -6029,13 +6037,16 @@ window.dataUpdatedText = function (en) {
       introDemoWhy: '記録が入った状態でさわれます。何も保存されません。',
       googleSoon: 'Google ログインは準備中です。いまは、この端末に記録を保存して使えます。',
       googleFail: 'Google につながりませんでした。通信を確かめて、もう一度お試しください。',
-      googleOn: m => m + 'でログイン中',
+      googleNoDrive: 'Googleドライブへの許可にチェックが入らなかったため、記録を預けられません。\n\nもう一度ログインして、Googleドライブのチェックを入れてください。\nいまは、この端末に記録を保存して使えます。',
+      googleOn: m => 'Googleドライブで使用中 · ' + m,
       googleOut: 'Google からログアウト',
-      googleOutAsk: 'ログアウトしますか？Google ドライブに預けた控えは消えます。この端末の記録はそのまま残ります。',
-      googleDone: m => m + 'でログインしました。これから記録は Google ドライブにも預けられます。',
-      googleBoth: 'この端末と Google ドライブの両方に記録があります。\n\nOK → Google ドライブのものを使う（この端末の記録は置きかわります）\nキャンセル → この端末のものを使う（Google ドライブが置きかわります）',
+      googleOutAsk: 'ログアウトしますか？\n\nこの端末からは記録が消えますが、Googleドライブには残ります。またログインすれば、続きから使えます。',
+      googleOutBusy: 'いちばん新しい変更が、まだGoogleドライブに届いていません。通信を確かめて、少し待ってからもう一度お試しください。',
+      googleOutDone: 'ログアウトしました。記録はGoogleドライブに残っています。',
+      googleDone: m => m + 'でログインしました。これから記録はGoogleドライブに保存されます。',
+      googleMove: 'この端末の記録を、Googleドライブに移しますか？\n\nOK → 移す（これまでの記録をそのまま使えます）\nキャンセル → 移さない（Googleドライブにある記録を使います）',
       googleSavedAt: d => d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' に保存',
-      setGoogleSub: '端末を変えても、データを消しても記録は残ります。',
+      setGoogleSub: '記録をGoogleドライブに保存して、どの端末でも同じ記録を使えます。',
       setPrivacy: 'プライバシーポリシー',
       setPrivacySub: '何を・どこに置き・何に使うか',
       tabPacking: '持ち物',
@@ -8248,7 +8259,23 @@ window.dataUpdatedText = function (en) {
     document.getElementById('reset-title').setAttribute('data-i18n', 'resetTitle2');
     document.getElementById('reset-title').textContent = t('resetTitle2');
   });
-  document.getElementById('reset-do').addEventListener('click', () => {
+  // 削除の画面を開いたとき、ログイン中ならドライブの行も出す
+  (() => {
+    const m = document.getElementById('reset-modal');
+    if (!m) return;
+    new MutationObserver(() => {
+      if (!m.classList.contains('show')) return;
+      const row = document.getElementById('reset-item-drive');
+      if (row) row.hidden = !(window.gdriveAPI && window.gdriveAPI.on());
+    }).observe(m, { attributes: true, attributeFilter: ['class'] });
+  })();
+  document.getElementById('reset-do').addEventListener('click', async () => {
+    // ログイン中なら、Googleドライブの記録も先に消す
+    if (window.gdriveAPI && window.gdriveAPI.on()) {
+      const ok = await window.gdriveAPI.wipe();
+      if (!ok) { alert(t('resetDriveFail')); return; }
+      window.gdriveAPI.signOutQuiet();
+    }
     resetConfirmed = true;
     closeResetModal();
     document.getElementById('reset').click();
@@ -9286,8 +9313,12 @@ window.dataUpdatedText = function (en) {
           });
         }
         client.callback = resp => {
-          if (resp && resp.access_token) { token = resp.access_token; tokenAt = Date.now(); res(token); }
-          else rej(new Error((resp && resp.error) || 'no-token'));
+          if (!resp || !resp.access_token) return rej(new Error((resp && resp.error) || 'no-token'));
+          // ドライブへの許可にチェックが入らなかったときは、保存できない
+          const ok = !google.accounts.oauth2.hasGrantedAllScopes ||
+            google.accounts.oauth2.hasGrantedAllScopes(resp, 'https://www.googleapis.com/auth/drive.appdata');
+          if (!ok) return rej(new Error('no-drive'));
+          token = resp.access_token; tokenAt = Date.now(); res(token);
         };
         client.error_callback = e => rej(new Error((e && e.type) || 'cancelled'));
         try { client.requestAccessToken({ prompt: interactive ? 'consent' : '' }); }
@@ -9397,7 +9428,11 @@ window.dataUpdatedText = function (en) {
 
     async function signIn() {
       if (!(await waitReady())) { alert(t('googleFail')); return; }
-      try { await getToken(true); } catch (e) { return; }      // 利用者がやめた場合は何も言わない
+      try { await getToken(true); }
+      catch (e) {
+        if (e && e.message === 'no-drive') alert(t('googleNoDrive'));
+        return;                                                  // やめた場合は何も言わない
+      }
       let who = '';
       try { who = await whoami(); } catch (e) {}
       setMail(who || 'google');
@@ -9405,10 +9440,9 @@ window.dataUpdatedText = function (en) {
       try { remote = await pull(); } catch (e) {}
       const here = pack();
       if (remote && !isEmpty(remote) && !isEmpty(here)) {
-        // 両方に記録があるとき、どちらを残すか選んでもらう
-        const keepRemote = confirm(t('googleBoth'));
-        if (keepRemote) { unpack(remote); location.reload(); return; }
-        await save();
+        // 端末にも、ドライブにも記録がある。どちらを続けるか1回だけ聞く
+        if (confirm(t('googleMove'))) await save();           // 端末のものを移す
+        else { unpack(remote); location.reload(); return; }   // ドライブのものを使う
       } else if (remote && !isEmpty(remote)) {
         unpack(remote); location.reload(); return;
       } else {
@@ -9418,12 +9452,36 @@ window.dataUpdatedText = function (en) {
       alert(t('googleDone')(mail()));
     }
 
-    function signOut() {
+    // Googleドライブに預けた控えを消す
+    async function wipe() {
+      try {
+        const id = await findFile();
+        if (!id) return true;                       // もともと無ければ、消すものがない
+        await api('https://www.googleapis.com/drive/v3/files/' + id, { method: 'DELETE' });
+        fileId = null;
+        return true;
+      } catch (e) { return false; }
+    }
+
+    // この端末から記録を消す（Googleドライブには残る）
+    function clearHere() {
+      const keys = ['wanderlog-v3', 'your-travels-japan-v1']
+        .concat(window.packingKeys ? window.packingKeys() : []);
+      keys.forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+    }
+
+    async function signOut() {
       if (!confirm(t('googleOutAsk'))) return;
+      // いちばん新しい変更がドライブに届いているか、先に確かめる
+      clearTimeout(timer);
+      try { await push(); }
+      catch (e) { alert(t('googleOutBusy')); return; }   // 届いていなければ、消さずに止める
       try { if (token && ready()) google.accounts.oauth2.revoke(token, () => {}); } catch (e) {}
       token = null; fileId = null;
       setMail(''); setSavedAt('');
-      render();
+      clearHere();                                       // 端末からは消す
+      alert(t('googleOutDone'));
+      location.reload();
     }
 
     // 設定とトップの表示を書きかえる
@@ -9445,8 +9503,15 @@ window.dataUpdatedText = function (en) {
       }
     }
 
+    function signOutQuiet() {
+      try { if (token && ready()) google.accounts.oauth2.revoke(token, () => {}); } catch (e) {}
+      token = null; fileId = null;
+      setMail(''); setSavedAt('');
+      render();
+    }
+
     window.gdriveAPI = {
-      signIn, signOut, render, schedule,
+      signIn, signOut, signOutQuiet, render, schedule, wipe,
       on: () => !!mail(),
       mail
     };
