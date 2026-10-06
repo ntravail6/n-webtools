@@ -9422,13 +9422,6 @@ window.dataUpdatedText = function (en) {
     const setSavedAt = v => { try { v ? localStorage.setItem(SEEN_KEY, v) : localStorage.removeItem(SEEN_KEY); } catch (e) {} };
 
     function ready() { return !!(window.google && google.accounts && google.accounts.oauth2); }
-    function waitReady() {
-      return new Promise(res => {
-        if (ready()) return res(true);
-        let n = 0;
-        const t = setInterval(() => { if (ready() || ++n > 60) { clearInterval(t); res(ready()); } }, 150);
-      });
-    }
 
     // 許可をもらう（はじめては画面が出る。2回目からは黙って取り直す）
     function getToken(interactive) {
@@ -9565,7 +9558,7 @@ window.dataUpdatedText = function (en) {
     function schedule() {
       if (!mail()) return;
       clearTimeout(timer);
-      timer = setTimeout(() => { save(); }, 2500);
+      timer = setTimeout(() => { timer = null; save(); }, 2500);
     }
     async function save(loud) {
       if (!mail()) return;
@@ -9579,13 +9572,16 @@ window.dataUpdatedText = function (en) {
       if (err && loud) throw err;
     }
 
-    async function signIn() {
-      if (!(await waitReady())) { alert(t('googleFail')); return; }
-      try { await getToken(true); }
-      catch (e) {
+    // 押したその場でGoogleを呼ぶ（間に待ち時間を入れると、ブラウザに止められる）
+    function signIn() {
+      if (!ready()) { alert(t('googleFail')); return; }
+      getToken(true).then(afterToken).catch(e => {
         if (e && e.message === 'no-drive') alert(t('googleNoDrive'));
-        return;                                                  // やめた場合は何も言わない
-      }
+        // やめた場合は何も言わない
+      });
+    }
+
+    async function afterToken() {
       // ── Googleドライブの中身を読む。
       //    読めなかったときは、ここで止める。
       //    （読めたと思いこんで端末のものを書き込むと、ほかの端末の記録が消えてしまう）
@@ -9681,15 +9677,35 @@ window.dataUpdatedText = function (en) {
       render();
     }
 
+    // ── アプリを開いたとき、Googleドライブのほうが新しければ取り込む ──
+    //   （ほかの端末で書いたものが、開くだけで反映されるように）
+    async function sync() {
+      if (!mail()) return;
+      if (busy || timer) return;     // まだ送っていない書きかけがあるときは、読みにいかない
+      let remote = null;
+      try { remote = await pull(); } catch (e) { return; }   // 読めなければ、何もしない
+      if (!remote) return;
+      const mine = savedAt();
+      // 向こうのほうが新しいときだけ入れかえる（こちらの書きかけを消さないため）
+      if (mine && remote.savedAt && remote.savedAt <= mine) return;
+      if (same(remote, pack())) { setSavedAt(remote.savedAt || ''); render(); return; }
+      unpack(remote);
+      setSavedAt(remote.savedAt || '');
+      location.reload();
+    }
+
     window.gdriveAPI = {
-      signIn, signOut, signOutQuiet, render, schedule, wipe,
+      signIn, signOut, signOutQuiet, render, schedule, wipe, sync,
       on: () => !!mail(),
       mail
     };
     // 画面の言葉が切り替わったときも書きかえる
     window.addEventListener('yt:lang', render);
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(render, 0));
-    else setTimeout(render, 0);
+    const begin = () => { render(); setTimeout(sync, 400); };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setTimeout(begin, 0));
+    else setTimeout(begin, 0);
+    // ほかの画面から戻ってきたときも、新しいものがあれば取り込む
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
   })();
 </script>
 
